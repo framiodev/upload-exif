@@ -31,14 +31,14 @@ class UploadWatermarkController implements RequestHandlerInterface
              return new JsonResponse(['error' => 'Dosya yüklenemedi.'], 400);
         }
 
-        $watermarkDir = public_path('assets/watermarks');
+        $watermarkDir = $this->paths->public . '/assets/watermarks';
         if (!is_dir($watermarkDir)) {
             mkdir($watermarkDir, 0755, true);
         }
 
         $extension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
         if (strtolower($extension) !== 'png') {
-            return new JsonResponse(['error' => 'Sadece PNG dosyaları yüklenebilir.'], 400);
+            return new JsonResponse(['error' => 'Sadece PNG dosyalari yuklenebilir.'], 400);
         }
 
         $safeName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', pathinfo($file->getClientFilename(), PATHINFO_FILENAME));
@@ -47,7 +47,6 @@ class UploadWatermarkController implements RequestHandlerInterface
         $localFullPath = $watermarkDir . '/' . $finalFilename;
         $file->moveTo($localFullPath);
 
-        // Resize if too big (optional, but good for standardization)
         $driver = extension_loaded('imagick') ? 'imagick' : 'gd';
         $manager = new ImageManager(['driver' => $driver]);
         $img = $manager->make($localFullPath);
@@ -58,9 +57,11 @@ class UploadWatermarkController implements RequestHandlerInterface
         }
         $img->destroy();
 
+        $baseUrl = resolve(\Flarum\Http\UrlGenerator::class)->to('forum')->base();
+
         return new JsonResponse([
             'filename' => $finalFilename,
-            'url' => app()->url() . '/assets/watermarks/' . $finalFilename
+            'url' => $baseUrl . '/assets/watermarks/' . $finalFilename
         ], 200);
     }
 }

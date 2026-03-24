@@ -27,10 +27,10 @@ class DeleteWatermarkController implements RequestHandlerInterface
         $filename = \Illuminate\Support\Arr::get($request->getQueryParams(), 'filename');
 
         if (!$filename || preg_match('/\.\./', $filename)) {
-             return new JsonResponse(['error' => 'Geçersiz dosya adı.'], 400);
+             return new JsonResponse(['error' => 'Gecersiz dosya adi.'], 400);
         }
 
-        $watermarkDir = public_path('assets/watermarks');
+        $watermarkDir = $this->paths->public . '/assets/watermarks';
         $fullPath = $watermarkDir . '/' . basename($filename);
 
         if (file_exists($fullPath)) {
@@ -38,6 +38,6 @@ class DeleteWatermarkController implements RequestHandlerInterface
             return new EmptyResponse(204);
         }
 
-        return new JsonResponse(['error' => 'Dosya bulunamadı.'], 404);
+        return new JsonResponse(['error' => 'Dosya bulunamadi.'], 404);
     }
 }

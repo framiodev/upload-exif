@@ -23,7 +23,7 @@ class ListWatermarksController implements RequestHandlerInterface
         $actor = RequestUtil::getActor($request);
         $actor->assertRegistered(); // Only registered users can fetch watermarks
 
-        $watermarkDir = public_path('assets/watermarks');
+        $watermarkDir = $this->paths->public . '/assets/watermarks';
         
         if (!is_dir($watermarkDir)) {
             return new JsonResponse(['data' => []], 200);
@@ -32,12 +32,13 @@ class ListWatermarksController implements RequestHandlerInterface
         $files = array_diff(scandir($watermarkDir), ['.', '..']);
         $watermarks = [];
 
+        $baseUrl = resolve(\Flarum\Http\UrlGenerator::class)->to('forum')->base();
+
         foreach ($files as $file) {
             if (pathinfo($file, PATHINFO_EXTENSION) === 'png') {
-                // Determine file url
                 $watermarks[] = [
                     'filename' => $file,
-                    'url' => app()->url() . '/assets/watermarks/' . $file
+                    'url' => $baseUrl . '/assets/watermarks/' . $file
                 ];
             }
         }
