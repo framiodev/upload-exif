@@ -2,7 +2,6 @@
   "name": "framiodev/flarum-upload-exif",
   "description": "Framio Upload & EXIF",
   "type": "flarum-extension",
-  "version": "1.0.0",
   "keywords": [
     "flarum",
     "upload",
