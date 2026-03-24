@@ -1,0 +1,65 @@
+framiodev-upload-exif:
+  admin:
+    settings:
+      general_title: General Settings
+      max_width: Maximum Image Width (px)
+      compression_quality: Compression Quality (0-100)
+      thumb_width: Thumbnail Width
+      mini_width: Mini Gallery Width
+      firebase_title: Firebase Storage Settings
+      firebase_help: Enter your Firebase Storage (Google Cloud) credentials and bucket info. If you leave credentials blank, the system will look for the `storage/firebase-auth.json` file.
+      firebase_bucket: Firebase Bucket Name
+      firebase_credentials: Firebase Credentials (JSON)
+      brand_models_title: Topic - Brand & Model Mapping
+      brand_models_help: >
+        Automatically fill and restrict Brand and Model fields based on specific topics. <br/>
+        <strong>Topic Slug:</strong> The path of the topic in Flarum's address bar (e.g. <code>d/77-topic-name</code>).<br/>
+        <strong>Models:</strong> Enter options separated by commas (e.g. <code>Model A, Model B</code>).
+      path_placeholder: Topic Slug
+      brand_placeholder: Brand
+      models_placeholder: Models (comma separated)
+      add_rule: Add New Rule
+      seo_title: SEO and Bulk Operations
+      seo_help: >
+        Scans all previously uploaded photos on the forum and automatically applies the EXIF/credit information found in the message to the <strong>ALT</strong> tags of the images. You can use this occasionally to improve your site's SEO performance.
+      update_alt_tags: Bulk Update Old ALT Tags
+      update_alt_confirm: All existing photos' ALT tags will be updated with information from their messages. Are you sure?
+      update_alt_success: Success! A total of {count} links were updated.
+      update_alt_error: An unexpected error occurred.
+      save_settings: Save Settings
+      saved_success: All settings saved successfully!
+    media:
+      title: Media Management
+      search_placeholder: Search by filename or user...
+      empty_text: No matching image found.
+      edit: Edit
+      delete: Delete
+      delete_confirm: Are you sure you want to delete the file "{filename}"?
+      deleted_success: Image deleted.
+      edit_success: Filename updated successfully.
+      edit_error: Process failed.
+      name_empty: Filename cannot be empty.
+      previous: Previous
+      next: Next
+      unknown_user: Unknown / Deleted
+  forum:
+    upload:
+      button: Upload Photo
+      uploading: Uploading...
+      select_watermark: Select Watermark
+      no_watermark: None
+      success: Photo uploaded.
+      error: Error uploading photo.
+      gear: GEAR
+      camera: Camera
+      lens: Lens
+      aperture: Aperture
+      iso: ISO
+      exposure_time: Exposure
+      focal_length: Focal L.
+      date: Date
+      map: View on Map
+    gallery:
+      title: My Uploads
+      empty: You haven't uploaded any photos yet.
+      empty_admin: No photos found.

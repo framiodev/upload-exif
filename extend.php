@@ -53,4 +53,6 @@ return [
 
     (new Extend\Settings())
         ->serializeToForum('framioBrandModels', 'framio-upload-exif.brand_models'),
+    
+    (new Extend\Locales(__DIR__ . '/locale')),
 ];

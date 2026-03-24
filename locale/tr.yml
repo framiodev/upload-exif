@@ -1,0 +1,65 @@
+framiodev-upload-exif:
+  admin:
+    settings:
+      general_title: Genel Yapılandırma
+      max_width: Maksimum Fotoğraf Genişliği (px)
+      compression_quality: Sıkıştırma Kalitesi (0-100)
+      thumb_width: Thumbnail Genişliği
+      mini_width: Mini Galeri Genişliği
+      firebase_title: Firebase Depolama Ayarları
+      firebase_help: Görsellerin yükleneceği Firebase Storage (Google Cloud) kimlik ve kova bilgilerini giriniz. Kimlik bilgilerini boş bırakırsanız sistem `storage/firebase-auth.json` dosyasını aramaya devam eder.
+      firebase_bucket: Firebase Bucket Adı
+      firebase_credentials: Firebase Kimlik (JSON) İçeriği
+      brand_models_title: Konu - Marka & Model Eşleştirmesi
+      brand_models_help: >
+        Belirli bir konuda (başlıkta) Marka ve Model alanlarını otomatik doldurun ve sınırlandırın. <br/>
+        <strong>Konu Yolu:</strong> Flarum'da konunun adres çubuğundaki yoludur (örn: <code>d/77-konu-adi</code>).<br/>
+        <strong>Modeller:</strong> Seçenekleri virgülle ayırarak yazın (örn: <code>Travego 15 SHD, Travego 17 SHD</code>).
+      path_placeholder: Konu Yolu (Örn: d/77...)
+      brand_placeholder: Marka (Örn: Mercedes)
+      models_placeholder: Modeller (virgülle ayır)
+      add_rule: Yeni Eşleştirme Kuralı Ekle
+      seo_title: SEO ve Toplu İşlemler
+      seo_help: >
+        Forumda mevcut olan tüm fotoğrafları tarar ve mesaj içerisine girilmiş olan künye bilgilerini bularak fotoğrafların <strong>ALT</strong> etiketlerine otomatik olarak uygular. Sitenizin arama motorlarındaki performansını artırmak için bu işlemi yapabilirsiniz.
+      update_alt_tags: Eski ALT Etiketlerini Topluca Güncelle
+      update_alt_confirm: Tüm fotoğrafların ALT etiketleri mesajlardaki bilgilerle güncellenecek. Seçtiğiniz görseller işleme alınacaktır. Devam?
+      update_alt_success: Başarılı! Toplam {count} bağlantı güncellendi.
+      update_alt_error: Beklenmedik bir hata oluştu.
+      save_settings: Ayarları Kaydet
+      saved_success: Tüm ayarlar başarıyla kaydedildi!
+    media:
+      title: Medya Yönetimi
+      search_placeholder: Dosya adı veya kullanıcı ara...
+      empty_text: Kriterlere uygun görsel bulunamadı.
+      edit: Düzenle
+      delete: Sil
+      delete_confirm: '{filename} dosyasını silmek istediğinize emin misiniz?'
+      deleted_success: Görsel silindi.
+      edit_success: Dosya adı başarıyla güncellendi.
+      edit_error: İşlem başarısız.
+      name_empty: Dosya adı boş olamaz.
+      previous: Önceki
+      next: Sonraki
+      unknown_user: Bilinmiyor
+  forum:
+    upload:
+      button: Fotoğraf Yükle
+      uploading: Yükleniyor...
+      select_watermark: Filigran Seçin
+      no_watermark: Filigran Eklemeden Yükle
+      success: Görsel Yüklendi.
+      error: Görsel Yüklenemedi!
+      gear: EKİPMAN
+      camera: Kamera
+      lens: Lens
+      aperture: Diyafram
+      iso: ISO
+      exposure_time: Enstantane
+      focal_length: Odak U.
+      date: Tarih
+      map: Haritada İzle
+    gallery:
+      title: Yüklediğim Görseller
+      empty: Henüz hiçbir görsel yüklemediniz.
+      empty_admin: Sistemde henüz görsel yok.
