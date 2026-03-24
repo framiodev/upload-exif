@@ -1,0 +1,334 @@
+/* ==========================================================================
+   SPOTTERS TURKEY - PRO LAYOUT (CAIRO FONT)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+
+.FramioCard {
+    background: @control-bg;
+    border: 1px solid darken(@control-bg, 5%);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 15px 0;
+    width: 100%;
+    position: relative;
+    z-index: 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    font-family: 'Cairo', sans-serif;
+
+    /* RESİM ALANI */
+    .FramioCard-image-wrapper {
+        background: transparent;
+        text-align: center;
+        position: relative;
+        min-height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 850px;
+            object-fit: cover;
+            margin: 0 auto;
+        }
+    }
+
+    /* Orijinal Butonu */
+    .FramioCard-zoomIcon {
+        position: absolute; top: 15px; right: 15px;
+        background: rgba(0, 0, 0, 0.7); color: #fff;
+        padding: 4px 12px; border-radius: 4px;
+        font-size: 0.85em; text-decoration: none;
+        opacity: 0; transition: opacity 0.3s;
+        z-index: 10; font-weight: 600;
+        &:hover { background: @primary-color; }
+    }
+    &:hover .FramioCard-zoomIcon { opacity: 1; }
+
+    /* BAŞLIK (Toggle) */
+    &-toggle {
+        padding: 10px 20px;
+        background: lighten(@control-bg, 2%);
+        cursor: pointer;
+        display: flex; justify-content: space-between; align-items: center;
+        font-size: 0.9em; color: @text-color; font-weight: 800;
+        border-top: 1px solid darken(@control-bg, 5%);
+        text-transform: uppercase; letter-spacing: 0.5px;
+        &:hover { background: @control-bg; }
+    }
+
+    /* EXIF GÖVDE */
+    &-exif {
+        padding: 20px 25px;
+        background: @body-bg;
+        border-top: 1px solid @control-bg;
+        &.fade-in { animation: fadeIn 0.3s ease-in-out; }
+    }
+
+    /* YENİ GELİŞMİŞ GRID YAPISI */
+    &-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px; /* Sol ve Sağ blok arasındaki boşluk */
+    }
+
+    /* SOL SÜTUN: EKİPMAN (Kamera + Lens) */
+    .sc-left-col {
+        flex: 1; /* Alanın yarısını kapla */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 200px;
+        border-right: 1px solid fade(@muted-color, 10%); /* Ayırıcı çizgi */
+        padding-right: 20px;
+
+        .gear-group {
+            margin-bottom: 15px;
+            &:last-child { margin-bottom: 0; }
+        }
+
+        .gear-label {
+            color: @muted-color;
+            font-size: 0.7em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .gear-name {
+            color: @text-color;
+            font-size: 1.1em;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        
+        .lens-name {
+            color: @text-color;
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+    }
+
+    /* SAĞ SÜTUN: AYARLAR (2x2 Grid) */
+    .sc-right-col {
+        flex: 1; /* Diğer yarıyı kapla */
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* 2 Sütun */
+        gap: 15px 10px; /* Dikey Yatay boşluk */
+        min-width: 200px;
+        
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            
+            span {
+                color: @muted-color;
+                font-size: 0.7em;
+                font-weight: 700;
+                text-transform: uppercase;
+                margin-bottom: 2px;
+            }
+            
+            b {
+                color: @text-color;
+                font-size: 1.1em;
+                font-weight: 800;
+            }
+        }
+    }
+
+    /* ALT ALAN: TARİH ve HARİTA */
+    .sc-footer {
+        flex-basis: 100%; /* Tam genişlik */
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid fade(@muted-color, 10%);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        
+        .date-box {
+            display: flex;
+            flex-direction: column;
+            span { color: @muted-color; font-size: 0.7em; font-weight: 700; text-transform: uppercase; }
+            b { color: @text-color; font-size: 0.95em; font-weight: 700; }
+        }
+
+        .map-btn {
+            color: @primary-color;
+            font-weight: 700;
+            font-size: 0.9em;
+            text-decoration: none;
+            padding: 6px 15px;
+            background: fade(@primary-color, 8%);
+            border-radius: 6px;
+            transition: all 0.2s;
+            
+            &:hover { background: @primary-color; color: #fff; }
+        }
+    }
+}
+
+/* MOBİL UYUMU */
+@media (max-width: 768px) {
+    .FramioCard-grid { gap: 20px; flex-direction: column; }
+    .sc-left-col { border-right: none; border-bottom: 1px solid fade(@muted-color, 10%); padding-right: 0; padding-bottom: 15px; }
+}
+
+/* DİĞER (Değişmedi) */
+.Gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; max-height: 400px; overflow-y: auto; padding: 5px; }
+.Gallery-item { border: 1px solid #ddd; border-radius: 6px; overflow: hidden; cursor: pointer; transition: all 0.2s; position: relative; background: #fff; &:hover { border-color: @primary-color; } .Gallery-image-wrapper { height: 120px; background: #f0f0f0; img { width: 100%; height: 100%; object-fit: cover; } } .Gallery-actions { padding: 5px 8px; display: flex; justify-content: space-between; align-items: center; background: #fafafa; border-top: 1px solid #eee; } .Gallery-date { font-size: 0.75em; color: #999; } .Button--danger { padding: 2px 6px; font-size: 12px; color: #e74c3c; background: transparent; &:hover { background: #fee; } } }
+.Gallery-empty { text-align: center; padding: 30px; color: #999; font-style: italic; }
+.FramioUpload-wrapper { display: inline-block; vertical-align: middle; margin-right: 2px; }
+.Watermark-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.Watermark-option { border: 1px solid #ddd; border-radius: 6px; padding: 10px; cursor: pointer; text-align: center; &:hover { border-color: @primary-color; } &.active { border-color: @primary-color; background: fade(@primary-color, 5%); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ==========================================================================
+   ESKİ GÖRSELLER İÇİN DÜZELTME (FoF Upload vb.)
+   ========================================================================== */
+.framio-old-image {
+    margin-bottom: 0 !important;
+    margin-top: 10px !important;
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* --- SPOTTER LIGHTBOX (SLAYT) TASARIMI --- */
+
+.Framio-Gallery-Item {
+    transition: transform 0.2s;
+    /* Resimlerin kutuya tam oturması için */
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    &:hover {
+        transform: scale(1.02);
+        .Framio-Hover-Icon { opacity: 1; }
+    }
+}
+
+.Framio-Hover-Icon {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.3);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none; /* Tıklamayı engellemesin */
+}
+
+/* Lightbox Arka Plan */
+.Framio-Lightbox-Overlay {
+    position: fixed;
+    z-index: 9999; /* En üstte */
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.95); /* Biraz daha koyu */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.Framio-Lightbox-Close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #fff;
+    font-size: 35px;
+    cursor: pointer;
+    z-index: 10002;
+    opacity: 0.7;
+    transition: 0.3s;
+    &:hover { opacity: 1; transform: rotate(90deg); }
+}
+
+.Framio-Lightbox-Container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0 60px; /* Oklar için boşluk */
+    box-sizing: border-box;
+}
+
+/* Oklar */
+.Framio-Nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.5);
+    font-size: 50px;
+    padding: 20px;
+    cursor: pointer;
+    z-index: 10001;
+    transition: 0.2s;
+    user-select: none;
+
+    &:hover { color: #fff; transform: translateY(-50%) scale(1.1); }
+    &.Prev { left: 10px; }
+    &.Next { right: 10px; }
+}
+
+/* Resim ve Bilgi Kapsayıcısı */
+.Framio-Main-Image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    max-height: 100%;
+    
+    img {
+        /* KESİN ÇÖZÜM KODLARI: */
+        max-width: 90vw;  /* Ekran genişliğinin %90'ı */
+        max-height: 85vh; /* Ekran yüksekliğinin %85'i */
+        min-width: 400px; /* En az 400px olsun (küçülmeyi engeller) */
+        width: auto;
+        height: auto;
+        object-fit: contain; /* Oran koruyarak sığdır */
+        
+        border-radius: 4px;
+        box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        cursor: zoom-in;
+    }
+}
+
+.Framio-Image-Meta {
+    color: #bbb;
+    margin-top: 15px;
+    font-size: 15px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    gap: 15px;
+    background: rgba(0,0,0,0.5);
+    padding: 5px 15px;
+    border-radius: 20px;
+}
+
+/* Mobilde Düzenlemeler */
+@media (max-width: 768px) {
+    .Framio-Lightbox-Container { padding: 0; }
+    .Framio-Nav { font-size: 30px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 50%; }
+    .Framio-Nav.Prev { left: 10px; }
+    .Framio-Nav.Next { right: 10px; }
+    
+    .Framio-Main-Image img {
+        min-width: auto; /* Mobilde min-width zorlaması kalksın */
+        max-width: 95vw;
+        max-height: 70vh;
+    }
+}

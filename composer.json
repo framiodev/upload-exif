@@ -1,0 +1,39 @@
+{
+  "name": "framiodev/flarum-upload-exif",
+  "description": "Framio Upload & EXIF",
+  "type": "flarum-extension",
+  "version": "1.0.0",
+  "keywords": [
+    "flarum",
+    "upload",
+    "exif",
+    "image"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "framiodev",
+      "email": "alikaan@ulasiminfo.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "flarum/core": "^1.0",
+    "intervention/image": "^2.7"
+  },
+  "extra": {
+    "flarum-extension": {
+      "title": "Framio Upload & EXIF",
+      "icon": {
+        "name": "fas fa-camera",
+        "backgroundColor": "#e74c3c",
+        "color": "#fff"
+      }
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Framio\\UploadExif\\": "src/"
+    }
+  }
+}
