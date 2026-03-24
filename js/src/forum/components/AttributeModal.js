@@ -10,47 +10,60 @@ export default class AttributeModal extends Modal {
     const initial = this.attrs.initialValues || {};
     this.currentFile = this.attrs.file; 
 
-    this.company = Stream(initial.company || '');
-    this.plate = Stream(initial.plate || '');
-    this.brand = Stream(initial.brand || '');
-    this.model = Stream(initial.model || '');
-    this.location = Stream(initial.location || '');
-    this.year = Stream(initial.year || '');
-
     this.onsubmitCallback = this.attrs.onsubmit;
     this.onskipCallback = this.attrs.onskip;
     this.onInfoCallback = this.attrs.onInfo;
 
-    this.matchedRule = null;
-    this.availableModels = [];
-    
-    let rawRules = app.forum.attribute('framioBrandModels');
-    let rules = [];
+    this.customFields = [];
+    this.fieldValues = {};
+
+    let rawFields = app.forum.attribute('framioCustomFields');
     try {
-        if (rawRules) {
-            const parsed = JSON.parse(rawRules);
+        if (rawFields) {
+            const parsed = JSON.parse(rawFields);
             if (Array.isArray(parsed)) {
-                rules = parsed;
+                this.customFields = parsed;
             }
         }
     } catch(e) {
-        console.error("BrandModels parse error:", e);
+        console.error("CustomFields parse error:", e);
     }
 
     const currentRoute = window.location.pathname || '';
 
-    for (let rule of rules) {
-        if (rule.tagSlug && rule.tagSlug.trim() !== '' && currentRoute.includes(rule.tagSlug.trim())) {
-            this.matchedRule = rule;
-            this.brand(rule.brand || '');
-            this.availableModels = (rule.models || '').split(',').map(s => s.trim()).filter(Boolean);
+    // Filter fields to those matching the current tag slug (if defined)
+    const validFields = [];
+    for (let field of this.customFields) {
+        if (!field.label || field.label.trim() === '') continue;
+
+        let shouldShow = true;
+        if (field.tags && field.tags.trim() !== '') {
+            shouldShow = currentRoute.includes(field.tags.trim());
+        }
+
+        if (shouldShow) {
+            validFields.push(field);
             
-            if (this.availableModels.length > 0 && !this.availableModels.includes(this.model())) {
-                this.model(this.availableModels[0]);
-            }
-            break;
+            // Generate field key from label
+            const fieldKey = this.generateFieldKey(field.label);
+            this.fieldValues[fieldKey] = {
+                stream: Stream(initial[fieldKey] || ''),
+                label: field.label,
+                options: field.options ? field.options.split(',').map(s => s.trim()).filter(Boolean) : []
+            };
         }
     }
+
+    this.activeFields = validFields;
+  }
+
+  generateFieldKey(label) {
+      if (!label) return 'unknown';
+      // Normalize english/turkish characters and make it safe
+      return label.toLowerCase()
+        .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+        .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+        .replace(/[^a-z0-9]/g, '_');
   }
 
   className() {
@@ -58,67 +71,63 @@ export default class AttributeModal extends Modal {
   }
 
   title() {
-    return 'Araç Künye Bilgileri';
+    return 'Görsel Etiketleri (Künye)';
   }
 
   content() {
-    const labelStyle = "display: flex; align-items: flex-end; min-height: 36px; margin-bottom: 6px; font-weight: bold; font-size: 13px; line-height: 1.3;";
+    const labelStyle = "display: block; min-height: 25px; margin-bottom: 6px; font-weight: bold; font-size: 13px; color: #333;";
+
+    // Split fields into chunks of 2 for row display
+    const fieldRows = [];
+    const keys = Object.keys(this.fieldValues);
+    for (let i = 0; i < keys.length; i += 2) {
+        fieldRows.push(keys.slice(i, i + 2));
+    }
 
     return (
       <div className="Modal-body">
         <div className="Form-group">
             <p className="helpText" style="margin-bottom: 25px; font-size: 14px; color: #666; text-align: center;">
-                Fotoğraflar arka planda yükleniyor. Lütfen araç bilgilerini giriniz.<br/>
+                Fotoğraflar arka planda yükleniyor. Gerekli detayları tanımlayabilirsiniz.<br/>
                 <i style="font-size: 12px; color: #999;">(Boş bırakılan alanlar şablonda gösterilmez)</i>
             </p>
 
-            <div style="display: flex; gap: 20px; margin-bottom: 15px;">
-                <div style="flex: 1;">
-                    <label style={labelStyle}>Firma İsmi (Örn: Kamil Koç)</label>
-                    <input className="FormControl" bidi={this.company} />
+            {fieldRows.map(rowKeys => (
+                <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                    {rowKeys.map(key => {
+                        const field = this.fieldValues[key];
+                        return (
+                            <div style="flex: 1;">
+                                <label style={labelStyle}>{field.label}</label>
+                                {field.options && field.options.length > 0 ? (
+                                    <select className="FormControl" onchange={e => field.stream(e.target.value)} value={field.stream()}>
+                                        <option value="">-- Seçiniz --</option>
+                                        {field.options.map(opt => <option value={opt}>{opt}</option>)}
+                                    </select>
+                                ) : (
+                                    <input className="FormControl" bidi={field.stream} />
+                                )}
+                            </div>
+                        );
+                    })}
+                    {rowKeys.length === 1 && <div style="flex: 1;"></div> /* Spacer for uneven rows */}
                 </div>
-                <div style="flex: 1;">
-                    <label style={labelStyle}>Plaka (Örn: 34 ABC 12)</label>
-                    <input className="FormControl" bidi={this.plate} />
-                </div>
-            </div>
+            ))}
 
-            <div style="display: flex; gap: 20px; margin-bottom: 15px;">
-                <div style="flex: 1;">
-                    <label style={labelStyle}>Marka (Örn: Mercedes-Benz)</label>
-                    <input className="FormControl" bidi={this.brand} disabled={!!this.matchedRule} />
+            {keys.length === 0 && (
+                <div style="text-align: center; padding: 20px; color: #888;">
+                    Tanımlanmış özel alan bulunmuyor. Bu ekranı geçebilirsiniz.
                 </div>
-                <div style="flex: 1;">
-                    <label style={labelStyle}>Model (Örn: Travego 15 SHD)</label>
-                    {this.matchedRule && this.availableModels.length > 0 ? (
-                        <select className="FormControl" onchange={e => this.model(e.target.value)} value={this.model()}>
-                            {this.availableModels.map(modelName => <option value={modelName}>{modelName}</option>)}
-                        </select>
-                    ) : (
-                        <input className="FormControl" bidi={this.model} />
-                    )}
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 20px; margin-bottom: 30px;">
-                <div style="flex: 1;">
-                    <label style={labelStyle}>Çekim Yeri (Örn: İstanbul)</label>
-                    <input className="FormControl" bidi={this.location} />
-                </div>
-                <div style="flex: 1;">
-                    <label style={labelStyle}>Yıl (Örn: 2025)</label>
-                    <input className="FormControl" type="number" bidi={this.year} />
-                </div>
-            </div>
+            )}
             
-            <div className="Form-group" style="display: flex; justify-content: space-between; align-items: center;">
+            <div className="Form-group" style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
                  <Button className="Button Button--primary" style="background-color: #3498db; border-color: #3498db;" icon="fas fa-info-circle" onclick={this.goToInfo.bind(this)}>
-                    Info Ekle
+                    Ek Metin (Info) Ekle
                  </Button>
 
                  <div style="display: flex; gap: 10px;">
                     <Button className="Button Button--text" onclick={this.skip.bind(this)}>
-                        Künye Ekleme
+                        {keys.length === 0 ? 'Geç' : 'Künye Ekleme'}
                     </Button>
                     <Button className="Button Button--primary" onclick={this.submit.bind(this)}>
                         Bilgileri Onayla
@@ -131,56 +140,37 @@ export default class AttributeModal extends Modal {
   }
 
   getRawData() {
-      return {
-          company: this.company(),
-          plate: this.plate(),
-          brand: this.brand(),
-          model: this.model(),
-          location: this.location(),
-          year: this.year()
-      };
+      const data = {};
+      Object.keys(this.fieldValues).forEach(key => {
+          data[key] = this.fieldValues[key].stream();
+      });
+      return data;
   }
 
   prepareData() {
     const lines = [];
-    const firmVal = this.company();
-    const plateVal = this.plate();
-    let line1 = '';
-    if (firmVal && plateVal) line1 = `${firmVal} | ${plateVal}`;
-    else if (firmVal) line1 = firmVal;
-    else if (plateVal) line1 = plateVal;
-    if (line1) lines.push(`- **${line1}**`);
 
-    const brandVal = this.brand();
-    const modelVal = this.model();
-    let line2 = '';
-    if (brandVal && modelVal) line2 = `${brandVal} ${modelVal}`;
-    else if (brandVal) line2 = brandVal;
-    else if (modelVal) line2 = modelVal;
-    if (line2) lines.push(`- **${line2}**`);
-
-    const locVal = this.location();
-    let yearVal = this.year();
-    if (yearVal) yearVal = "'" + yearVal.toString().slice(-2);
-
-    let line3 = '';
-    if (locVal && yearVal) line3 = `${locVal} / ${yearVal}`;
-    else if (locVal) line3 = locVal;
-    else if (yearVal) line3 = yearVal;
-    if (line3) lines.push(`- **${line3}**`);
+    // Dynamically iterate and push non-empty values
+    Object.keys(this.fieldValues).forEach(key => {
+        const field = this.fieldValues[key];
+        const val = field.stream();
+        if (val && val.trim() !== '') {
+            lines.push(`- **${field.label}:** ${val}`);
+        }
+    });
 
     return lines.length > 0 ? lines.join('\n') : null;
   }
 
   submit(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const resultText = this.prepareData();
     if (this.onsubmitCallback) this.onsubmitCallback(resultText);
     app.modal.close();
   }
 
   goToInfo(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
       const resultText = this.prepareData();
       const rawData = this.getRawData();
       

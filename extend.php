@@ -52,7 +52,7 @@ return [
         ->listen(Saving::class, SaveAltTagFromContent::class),
 
     (new Extend\Settings())
-        ->serializeToForum('framioBrandModels', 'framio-upload-exif.brand_models'),
+        ->serializeToForum('framioCustomFields', 'framio-upload-exif.custom_fields'),
     
     (new Extend\Locales(__DIR__ . '/locale')),
 ];
