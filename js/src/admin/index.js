@@ -1,8 +1,8 @@
 import app from 'flarum/admin/app';
 import FramioSettingsPage from './components/FramioSettingsPage';
 
-app.initializers.add('framio-upload-exif', () => {
+app.initializers.add('framiodev-upload-exif', () => {
   app.extensionData
-    .for('framio-upload-exif')
+    .for('framiodev-upload-exif')
     .registerPage(FramioSettingsPage);
 });
