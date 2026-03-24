@@ -9,6 +9,15 @@ export default class FramioSettingsPage extends ExtensionPage {
   oninit(vnode) {
     super.oninit(vnode);
 
+    this.activeTab = 'general';
+    this.tabs = [
+      { id: 'general', label: 'Genel Yapılandırma', icon: 'fas fa-cogs' },
+      { id: 'firebase', label: 'Firebase Depolama', icon: 'fas fa-cloud-upload-alt' },
+      { id: 'brandmodels', label: 'Konu Eşleştirmesi', icon: 'fas fa-tags' },
+      { id: 'seo', label: 'SEO ve İşlemler', icon: 'fas fa-search' },
+      { id: 'media', label: 'Medya Yönetimi', icon: 'fas fa-images' }
+    ];
+
     this.searchQuery = '';
     this.images = [];
     this.isLoading = false;
@@ -33,303 +42,322 @@ export default class FramioSettingsPage extends ExtensionPage {
   content() {
     return [
       <div className="FramioSettingsPage">
-        <div className="container">
+        <div className="container" style={{ maxWidth: '1400px', marginTop: '30px', marginBottom: '40px' }}>
           
-          <div className="Form-group">
-            <h3 className="Settings-title">Genel Yapılandırma</h3>
-            {this.buildSettingComponent({
-                type: 'number',
-                setting: 'framio-upload-exif.resize_width',
-                label: 'Maksimum Fotoğraf Genişliği (px)',
-                placeholder: '3840'
-            })}
-            {this.buildSettingComponent({
-                type: 'number',
-                setting: 'framio-upload-exif.compression_quality',
-                label: 'Sıkıştırma Kalitesi (0-100)',
-                placeholder: '90'
-            })}
-             {this.buildSettingComponent({
-                type: 'number',
-                setting: 'framio-upload-exif.thumb_width',
-                label: 'Thumbnail Genişliği',
-                placeholder: '1024'
-            })}
-             {this.buildSettingComponent({
-                type: 'number',
-                setting: 'framio-upload-exif.mini_width',
-                label: 'Mini Galeri Genişliği',
-                placeholder: '250'
-            })}
-
-            <h3 className="Settings-title" style={{ marginTop: '30px' }}>Firebase Depolama Ayrları</h3>
-            <div className="helpText">Görsellerin yükleneceği Firebase Storage (Google Cloud) kimlik ve kova bilgilerini giriniz. Kimlik bilgilerini boş bırakırsanız sistem "storage/firebase-auth.json" dosyasını aramaya devam eder.</div>
-            
-            {this.buildSettingComponent({
-                type: 'text',
-                setting: 'framio-upload-exif.firebase_bucket',
-                label: 'Firebase Bucket Adı',
-                placeholder: 'ornek-proje.appspot.com'
-            })}
-            
-            <div className="Form-group">
-              <label>Firebase Kimlik (JSON) İçeriği</label>
-              <textarea 
-                className="FormControl" 
-                rows="6" 
-                bidi={this.setting('framio-upload-exif.firebase_credentials')} 
-                placeholder='{"type": "service_account", "project_id": "...", ...}'
-              />
-            </div>
-            
-            <div className="Form-group" style={{ marginTop: '30px', padding: '15px', background: '#f8f9fa', borderRadius: '5px', border: '1px solid #e9ecef' }}>
-                <h3 className="Settings-title" style={{ marginBottom: '10px' }}>Konu - Marka & Model Eşleştirmesi</h3>
-                <div className="helpText" style={{ marginBottom: '15px' }}>
-                    Belirli bir konuda (başlıkta) Marka ve Model alanlarını otomatik doldurun ve kısıtlayın. <br/>
-                    <strong>Konu Yolu:</strong> Flarum'da konunun adres çubuğundaki yoludur (örn: <code>d/77-mercedes-benz-tourismo</code>).<br/>
-                    <strong>Modeller:</strong> Seçenekleri virgülle ayırarak yazın (örn: <code>Travego 15 SHD, Travego 17 SHD</code>).
-                </div>
-                
-                {this.brandModelRules.map((rule, index) => (
-                    <div style={{ display: 'flex', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
-                        <input className="FormControl" placeholder="Konu Yolu (Örn: d/77...)" value={rule.tagSlug} oninput={e => rule.tagSlug = e.target.value} />
-                        <input className="FormControl" placeholder="Marka" value={rule.brand} oninput={e => rule.brand = e.target.value} />
-                        <input className="FormControl" placeholder="Modeller (virgülle ayrılmış)" value={rule.models} oninput={e => rule.models = e.target.value} />
-                        <Button className="Button Button--danger Button--icon" onclick={() => this.brandModelRules.splice(index, 1)} icon="fas fa-times"></Button>
-                    </div>
+          <div style={{ display: 'flex', gap: '30px', alignItems: 'flex-start' }}>
+            {/* SOL SEKMELER */}
+            <div style={{ width: '280px', flexShrink: 0 }}>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, background: '#fff', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e9ecef', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+                {this.tabs.map(tab => (
+                  <li 
+                    onclick={() => { this.activeTab = tab.id; m.redraw(); }}
+                    style={{ 
+                      padding: '16px 20px', 
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #e9ecef',
+                      background: this.activeTab === tab.id ? '#4D698E' : 'transparent',
+                      color: this.activeTab === tab.id ? '#fff' : '#333',
+                      fontWeight: this.activeTab === tab.id ? 'bold' : 'normal',
+                      transition: 'all 0.2s ease',
+                      fontSize: '15px'
+                    }}
+                  >
+                    <i className={tab.icon} style={{ width: '30px', textAlign: 'center', opacity: this.activeTab === tab.id ? 1 : 0.6 }}></i> {tab.label}
+                  </li>
                 ))}
-                
-                <Button className="Button" onclick={() => this.brandModelRules.push({tagSlug: '', brand: '', models: ''})} icon="fas fa-plus">
-                    Yeni Eşleştirme Ekle
-                </Button>
-            </div>
-
-            <div className="Form-group" style={{ marginTop: '20px' }}>
-                <Button className="Button Button--primary" onclick={this.save.bind(this)}>
+              </ul>
+              
+              <div style={{ marginTop: '20px' }}>
+                <Button className="Button Button--primary" onclick={this.save.bind(this)} icon="fas fa-save" style={{ width: '100%', padding: '12px', fontSize: '15px', fontWeight: 'bold' }}>
                     Ayarları Kaydet
                 </Button>
+              </div>
             </div>
-          </div>
-
-          <div className="Form-group" style={{ marginTop: '30px', padding: '15px', background: '#f8f9fa', borderRadius: '5px', border: '1px solid #e9ecef' }}>
-            <h3 className="Settings-title" style={{ marginBottom: '10px' }}>SEO ve Toplu İşlemler</h3>
-            <div className="helpText" style={{ marginBottom: '15px' }}>
-                Forumda daha önceden yüklenmiş tüm fotoğrafları tarar. Mesaj içerisine girilmiş olan künye bilgilerini bularak fotoğrafların ALT etiketlerine otomatik olarak uygular.
-            </div>
-            <Button 
-                className="Button Button--warning" 
-                loading={this.isUpdatingTags} 
-                onclick={this.updateTags.bind(this)}
-                icon="fas fa-sync-alt"
-            >
-                Eski ALT Etiketlerini Şimdi Güncelle
-            </Button>
-          </div>
-
-          <hr style={{ marginTop: '30px' }} />
-
-          <div className="MediaManager-section" style={{marginTop: '30px'}}>
             
-            <div className="MediaManager-header" style={{
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
-                marginBottom: '20px', 
-                flexWrap: 'wrap', 
-                gap: '15px'
-            }}>
-                <h3 className="Settings-title" style={{margin: 0}}>Medya Yönetimi</h3>
-                
-                <div className="MediaManager-search" style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
-                    <input 
-                        className="FormControl" 
-                        type="text" 
-                        placeholder="Dosya adı veya kullanıcı adı ile ara..." 
-                        value={this.searchQuery}
-                        oninput={e => this.searchQuery = e.target.value}
-                        onkeydown={e => { if (e.key === 'Enter') this.performSearch(); }}
-                        style={{width: '300px'}} 
-                    />
-                    <Button className="Button Button--primary" onclick={this.performSearch.bind(this)}>
-                        <i className="fas fa-search"></i>
-                    </Button>
-                </div>
+            {/* SAĞ İÇERİK */}
+            <div style={{ flex: 1, background: '#fff', border: '1px solid #e9ecef', borderRadius: '8px', padding: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', minHeight: '600px' }}>
+                {this.activeTab === 'general' && this.renderGeneralTab()}
+                {this.activeTab === 'firebase' && this.renderFirebaseTab()}
+                {this.activeTab === 'brandmodels' && this.renderBrandModelsTab()}
+                {this.activeTab === 'seo' && this.renderSeoTab()}
+                {this.activeTab === 'media' && this.renderMediaTab()}
             </div>
-
-            <div className="MediaManager-grid" style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(7, 1fr)', 
-                gap: '10px',
-                marginBottom: '20px'
-            }}>
-                {this.isLoading ? (
-                    <div style={{gridColumn: '1 / -1', textAlign: 'center', padding: '20px'}}>
-                        <LoadingIndicator />
-                    </div>
-                ) : this.images.length === 0 ? (
-                    <div style={{gridColumn: '1 / -1', textAlign: 'center', color: '#999', padding: '20px', fontStyle: 'italic'}}>
-                        Kriterlere uygun görsel bulunamadı.
-                    </div>
-                ) : (
-                    this.images.map(image => {
-                        const thumbUrl = image.attributes.thumb_path || image.attributes.url;
-                        const isEditing = this.editingImageId === image.id;
-                        const filenameWithoutExt = image.attributes.filename ? image.attributes.filename.replace(/\.[^/.]+$/, '') : '';
-                        
-                        return (
-                            <div className="MediaManager-card" style={{
-                                background: '#fff',
-                                border: '1px solid #ddd',
-                                borderRadius: '6px',
-                                overflow: 'hidden',
-                                display: 'flex',
-                                flexDirection: 'column'
-                            }}>
-                                <div style={{
-                                    height: '110px', 
-                                    backgroundColor: '#f9f9f9',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    overflow: 'hidden',
-                                    borderBottom: '1px solid #eee'
-                                }}>
-                                    <a href={image.attributes.url} target="_blank" style={{width: '100%', height: '100%'}}>
-                                        <img 
-                                            src={thumbUrl} 
-                                            alt="Thumbnail" 
-                                            loading="lazy" 
-                                            style={{
-                                                width: '100%',
-                                                height: '100%',
-                                                objectFit: 'cover', 
-                                                display: 'block'
-                                            }}
-                                        />
-                                    </a>
-                                </div>
-
-                                <div style={{padding: '8px', fontSize: '11px', flexGrow: 1}}>
-                                    {isEditing ? (
-                                        <div style={{marginBottom: '5px'}}>
-                                            <input
-                                                className="FormControl"
-                                                type="text"
-                                                value={this.editingName}
-                                                oninput={e => { this.editingName = e.target.value; }}
-                                                onkeydown={e => {
-                                                    if (e.key === 'Enter') this.saveImageName(image);
-                                                    if (e.key === 'Escape') this.cancelEditName();
-                                                }}
-                                                style={{
-                                                    fontSize: '11px',
-                                                    padding: '3px 5px',
-                                                    width: '100%',
-                                                    boxSizing: 'border-box'
-                                                }}
-                                                oncreate={vnode => { vnode.dom.focus(); vnode.dom.select(); }}
-                                            />
-                                            <div style={{display: 'flex', gap: '3px', marginTop: '4px'}}>
-                                                <Button
-                                                    className="Button Button--primary Button--small"
-                                                    loading={this.isSavingName}
-                                                    onclick={() => this.saveImageName(image)}
-                                                    style={{fontSize: '10px', padding: '2px 6px', flex: 1}}
-                                                >
-                                                    <i className="fas fa-check"></i>
-                                                </Button>
-                                                <Button
-                                                    className="Button Button--small"
-                                                    onclick={() => this.cancelEditName()}
-                                                    style={{fontSize: '10px', padding: '2px 6px', flex: 1}}
-                                                    disabled={this.isSavingName}
-                                                >
-                                                    <i className="fas fa-times"></i>
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div title={image.attributes.filename} style={{
-                                            fontWeight: 'bold', 
-                                            whiteSpace: 'nowrap', 
-                                            overflow: 'hidden', 
-                                            textOverflow: 'ellipsis',
-                                            marginBottom: '3px'
-                                        }}>
-                                            {image.attributes.filename}
-                                        </div>
-                                    )}
-                                    <div style={{color: '#666', marginBottom: '2px'}}>
-                                        <i className="fas fa-user"></i> {image.attributes.username}
-                                    </div>
-                                    <div style={{color: '#999'}}>
-                                        <i className="fas fa-clock"></i> {image.attributes.createdAt}
-                                    </div>
-                                </div>
-
-                                <div style={{padding: '5px', background: '#fafafa', borderTop: '1px solid #eee', display: 'flex', gap: '3px'}}>
-                                    <Button 
-                                        className="Button Button--small" 
-                                        icon="fas fa-pen"
-                                        onclick={() => this.startEditName(image, filenameWithoutExt)}
-                                        style={{fontSize: '10px', padding: '4px 6px', flex: 1, color: '#2196F3', borderColor: '#2196F3'}}
-                                        disabled={this.isSavingName}
-                                        title="Dosya Adı Düzenle"
-                                    >
-                                        Düzenle
-                                    </Button>
-                                    <Button 
-                                        className="Button Button--danger Button--small" 
-                                        icon="fas fa-trash-alt"
-                                        onclick={() => this.deleteImage(image)}
-                                        style={{fontSize: '10px', padding: '4px 6px', flex: 1}}
-                                        disabled={this.isSavingName}
-                                    >
-                                        Sil
-                                    </Button>
-                                </div>
-                            </div>
-                        );
-                    })
-                )}
-            </div>
-
-            <div className="MediaManager-footer" style={{
-                marginTop: '10px', 
-                display: 'flex', 
-                justifyContent: 'center', 
-                gap: '15px', 
-                alignItems: 'center',
-                paddingBottom: '30px'
-            }}>
-                <Button 
-                    className="Button" 
-                    icon="fas fa-chevron-left"
-                    disabled={this.offset === 0} 
-                    onclick={() => this.changePage(-1)}
-                >
-                    Önceki
-                </Button>
-
-                <span style={{fontWeight: 'bold', color: '#666'}}>
-                    {this.images.length > 0 ? `${this.offset + 1} - ${this.offset + this.images.length}` : '0'}
-                </span>
-
-                <Button 
-                    className="Button" 
-                    icon="fas fa-chevron-right"
-                    disabled={this.images.length < this.limit} 
-                    onclick={() => this.changePage(1)}
-                >
-                    Sonraki
-                </Button>
-            </div>
-
           </div>
+          
         </div>
       </div>
     ];
   }
+
+  /* --- SEKMELER --- */
+
+  renderGeneralTab() {
+    return (
+      <div className="Form-group">
+        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '25px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>Genel Yapılandırma</h3>
+        {this.buildSettingComponent({
+            type: 'number',
+            setting: 'framio-upload-exif.resize_width',
+            label: 'Maksimum Fotoğraf Genişliği (px)',
+            placeholder: '3840'
+        })}
+        {this.buildSettingComponent({
+            type: 'number',
+            setting: 'framio-upload-exif.compression_quality',
+            label: 'Sıkıştırma Kalitesi (0-100)',
+            placeholder: '90'
+        })}
+         {this.buildSettingComponent({
+            type: 'number',
+            setting: 'framio-upload-exif.thumb_width',
+            label: 'Thumbnail Genişliği',
+            placeholder: '1024'
+        })}
+         {this.buildSettingComponent({
+            type: 'number',
+            setting: 'framio-upload-exif.mini_width',
+            label: 'Mini Galeri Genişliği',
+            placeholder: '250'
+        })}
+      </div>
+    );
+  }
+
+  renderFirebaseTab() {
+    return (
+      <div className="Form-group">
+        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>Firebase Depolama Ayarları</h3>
+        <div className="helpText" style={{ marginBottom: '25px', fontSize: '14px', lineHeight: '1.5' }}>Görsellerin yükleneceği Firebase Storage (Google Cloud) kimlik ve kova bilgilerini giriniz. Kimlik bilgilerini boş bırakırsanız sistem <code>storage/firebase-auth.json</code> dosyasını aramaya devam eder.</div>
+        
+        {this.buildSettingComponent({
+            type: 'text',
+            setting: 'framio-upload-exif.firebase_bucket',
+            label: 'Firebase Bucket Adı',
+            placeholder: 'ornek-proje.appspot.com'
+        })}
+        
+        <div className="Form-group" style={{ marginTop: '25px' }}>
+          <label style={{ fontWeight: 'bold' }}>Firebase Kimlik (JSON) İçeriği</label>
+          <textarea 
+            className="FormControl" 
+            rows="10" 
+            bidi={this.setting('framio-upload-exif.firebase_credentials')} 
+            placeholder='{"type": "service_account", "project_id": "...", ...}'
+            style={{ fontFamily: 'monospace', fontSize: '13px', background: '#f8f9fa' }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  renderBrandModelsTab() {
+    return (
+      <div className="Form-group">
+        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>Konu - Marka & Model Eşleştirmesi</h3>
+        <div className="helpText" style={{ marginBottom: '30px', fontSize: '14px', lineHeight: '1.6' }}>
+            Belirli bir konuda (başlıkta) Marka ve Model alanlarını otomatik doldurun ve sınırlandırın. <br/>
+            <strong>Konu Yolu:</strong> Flarum'da konunun adres çubuğğndaki yoludur (örn: <code>d/77-konu-adi</code>).<br/>
+            <strong>Modeller:</strong> Seçenekleri virgülle ayırarak yazın (örn: <code>Travego 15 SHD, Travego 17 SHD</code>).
+        </div>
+        
+        {this.brandModelRules.map((rule, index) => (
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px', alignItems: 'center', background: '#f8f9fa', padding: '15px', borderRadius: '8px', border: '1px solid #e9ecef' }}>
+                <input className="FormControl" placeholder="Konu Yolu" value={rule.tagSlug} oninput={e => rule.tagSlug = e.target.value} style={{ flex: 1 }} />
+                <input className="FormControl" placeholder="Marka (Örn: Mercedes)" value={rule.brand} oninput={e => rule.brand = e.target.value} style={{ flex: 1 }} />
+                <input className="FormControl" placeholder="Modeller (virgülle ayır)" value={rule.models} oninput={e => rule.models = e.target.value} style={{ flex: 1.5 }} />
+                <Button className="Button Button--danger Button--icon" onclick={() => this.brandModelRules.splice(index, 1)} icon="fas fa-trash-alt" title="Sil"></Button>
+            </div>
+        ))}
+        
+        <div style={{ marginTop: '25px' }}>
+            <Button className="Button" onclick={() => this.brandModelRules.push({tagSlug: '', brand: '', models: ''})} icon="fas fa-plus">
+                Yeni Eşleştirme Kuralı Ekle
+            </Button>
+        </div>
+      </div>
+    );
+  }
+
+  renderSeoTab() {
+    return (
+      <div className="Form-group">
+        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>SEO ve Toplu İşlemler</h3>
+        <div className="helpText" style={{ marginBottom: '30px', fontSize: '14px', lineHeight: '1.6' }}>
+            Forumda mevcut olan tüm fotoğrafları tarar ve mesaj içerisine girilmiş olan künye bilgilerini bularak fotoğrafların <strong>ALT</strong> etiketlerine otomatik olarak uygular. Sitenizin arama motorlarındaki performansını artırmak için bu işlemi yapabilirsiniz.
+        </div>
+        <Button 
+            className="Button Button--warning" 
+            loading={this.isUpdatingTags} 
+            onclick={this.updateTags.bind(this)}
+            icon="fas fa-sync-alt"
+            style={{ padding: '10px 20px', fontSize: '15px' }}
+        >
+            Eski ALT Etiketlerini Topluca Güncelle
+        </Button>
+      </div>
+    );
+  }
+
+  renderMediaTab() {
+    return (
+      <div className="MediaManager-section">
+        <div className="MediaManager-header" style={{
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginBottom: '20px', 
+            flexWrap: 'wrap', 
+            gap: '15px',
+            borderBottom: '1px solid #eee',
+            paddingBottom: '15px'
+        }}>
+            <h3 className="Settings-title" style={{ margin: 0 }}>Medya Yönetimi</h3>
+            
+            <div className="MediaManager-search" style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
+                <input 
+                    className="FormControl" 
+                    type="text" 
+                    placeholder="Dosya adı veya kullanıcı ara..." 
+                    value={this.searchQuery}
+                    oninput={e => this.searchQuery = e.target.value}
+                    onkeydown={e => { if (e.key === 'Enter') this.performSearch(); }}
+                    style={{width: '300px'}} 
+                />
+                <Button className="Button Button--primary" onclick={this.performSearch.bind(this)}>
+                    <i className="fas fa-search"></i>
+                </Button>
+            </div>
+        </div>
+
+        <div className="MediaManager-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
+            gap: '20px',
+            marginBottom: '30px'
+        }}>
+            {this.isLoading ? (
+                <div style={{gridColumn: '1 / -1', textAlign: 'center', padding: '60px'}}>
+                    <LoadingIndicator />
+                </div>
+            ) : this.images.length === 0 ? (
+                <div style={{gridColumn: '1 / -1', textAlign: 'center', color: '#999', padding: '60px', fontStyle: 'italic', background: '#f8f9fa', borderRadius: '8px'}}>
+                    Kriterlere uygun görsel bulunamadı.
+                </div>
+            ) : (
+                this.images.map(image => {
+                    const thumbUrl = image.attributes.thumb_path || image.attributes.url;
+                    const isEditing = this.editingImageId === image.id;
+                    const filenameWithoutExt = image.attributes.filename ? image.attributes.filename.replace(/\.[^/.]+$/, '') : '';
+                    
+                    return (
+                        <div className="MediaManager-card" style={{
+                            background: '#fff',
+                            border: '1px solid #ddd',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                        }}>
+                            <div style={{
+                                height: '150px', 
+                                backgroundColor: '#f9f9f9',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                borderBottom: '1px solid #eee'
+                            }}>
+                                <a href={image.attributes.url} target="_blank" style={{width: '100%', height: '100%'}}>
+                                    <img 
+                                        src={thumbUrl} 
+                                        alt="Thumbnail" 
+                                        loading="lazy" 
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                    />
+                                </a>
+                            </div>
+
+                            <div style={{padding: '12px', fontSize: '13px', flexGrow: 1}}>
+                                {isEditing ? (
+                                    <div style={{marginBottom: '8px'}}>
+                                        <input
+                                            className="FormControl"
+                                            type="text"
+                                            value={this.editingName}
+                                            oninput={e => { this.editingName = e.target.value; }}
+                                            onkeydown={e => {
+                                                if (e.key === 'Enter') this.saveImageName(image);
+                                                if (e.key === 'Escape') this.cancelEditName();
+                                            }}
+                                            style={{ fontSize: '12px', padding: '5px 8px', width: '100%', boxSizing: 'border-box' }}
+                                            oncreate={vnode => { vnode.dom.focus(); vnode.dom.select(); }}
+                                        />
+                                        <div style={{display: 'flex', gap: '5px', marginTop: '6px'}}>
+                                            <Button className="Button Button--primary Button--small" loading={this.isSavingName} onclick={() => this.saveImageName(image)} style={{flex: 1}}>
+                                                <i className="fas fa-check"></i>
+                                            </Button>
+                                            <Button className="Button Button--small" onclick={() => this.cancelEditName()} disabled={this.isSavingName} style={{flex: 1}}>
+                                                <i className="fas fa-times"></i>
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div title={image.attributes.filename} style={{ fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '8px' }}>
+                                        {image.attributes.filename}
+                                    </div>
+                                )}
+                                <div style={{color: '#666', marginBottom: '4px'}}>
+                                    <i className="fas fa-user" style={{width: '16px'}}></i> {image.attributes.username}
+                                </div>
+                                <div style={{color: '#999'}}>
+                                    <i className="fas fa-clock" style={{width: '16px'}}></i> {image.attributes.createdAt}
+                                </div>
+                            </div>
+
+                            <div style={{padding: '8px', background: '#fafafa', borderTop: '1px solid #eee', display: 'flex', gap: '5px'}}>
+                                <Button 
+                                    className="Button Button--small" 
+                                    icon="fas fa-pen"
+                                    onclick={() => this.startEditName(image, filenameWithoutExt)}
+                                    style={{flex: 1, color: '#2196F3', borderColor: '#2196F3'}}
+                                    disabled={this.isSavingName}
+                                    title="Dosya Adı Düzenle"
+                                >
+                                    Düzenle
+                                </Button>
+                                <Button 
+                                    className="Button Button--danger Button--small" 
+                                    icon="fas fa-trash-alt"
+                                    onclick={() => this.deleteImage(image)}
+                                    style={{flex: 1}}
+                                    disabled={this.isSavingName}
+                                >
+                                    Sil
+                                </Button>
+                            </div>
+                        </div>
+                    );
+                })
+            )}
+        </div>
+
+        <div className="MediaManager-footer" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '20px', alignItems: 'center' }}>
+            <Button className="Button" icon="fas fa-chevron-left" disabled={this.offset === 0} onclick={() => this.changePage(-1)}>
+                Önceki
+            </Button>
+            <span style={{fontWeight: 'bold', color: '#666', fontSize: '15px'}}>
+                {this.images.length > 0 ? `${this.offset + 1} - ${this.offset + this.images.length}` : '0'}
+            </span>
+            <Button className="Button" icon="fas fa-chevron-right" disabled={this.images.length < this.limit} onclick={() => this.changePage(1)}>
+                Sonraki
+            </Button>
+        </div>
+      </div>
+    );
+  }
+
+  /* --- ACTIONS --- */
 
   startEditName(image, currentName) {
     this.editingImageId = image.id;
@@ -368,16 +396,14 @@ export default class FramioSettingsPage extends ExtensionPage {
       image.attributes.url = response.thumb_path || response.url;
       image.attributes.thumb_path = response.thumb_path;
       
-      app.alerts.show({ type: 'success' }, `Dosya adı "${response.filename}" olarak güncellendi. Firebase ve mesajlar da güncellendi.`);
+      app.alerts.show({ type: 'success' }, `Dosya adı başarıyla güncellendi.`);
       
       this.editingImageId = null;
       this.editingName = '';
       this.isSavingName = false;
       m.redraw();
     }).catch(error => {
-      const errorMsg = error && error.responseJSON && error.responseJSON.error
-        ? error.responseJSON.error
-        : 'Dosya adı değiştirilemedi. Lütfen tekrar deneyin.';
+      const errorMsg = error && error.responseJSON && error.responseJSON.error ? error.responseJSON.error : 'İşlem başarısız.';
       app.alerts.show({ type: 'error' }, errorMsg);
       this.isSavingName = false;
       m.redraw();
@@ -391,11 +417,11 @@ export default class FramioSettingsPage extends ExtensionPage {
     this.settings['framio-upload-exif.brand_models'](JSON.stringify(this.brandModelRules));
 
     saveSettings(this.settings)
-      .then(() => app.alerts.show({ type: 'success' }, 'Ayarlar kaydedildi.'));
+      .then(() => app.alerts.show({ type: 'success' }, 'Tüm ayarlar başarıyla kaydedildi!'));
   }
 
   updateTags() {
-    if (!confirm('Tüm mevcut fotoğrafların ALT etiketleri mesajlardaki künye bilgileriyle değiştirilecek. Bu işlem mesaj sayısına göre zaman alabilir. Onaylıyor musunuz?')) return;
+    if (!confirm('Tüm fotoğrafların ALT etiketleri mesajlardaki bilgilerle güncellenecek. Seçtiğiniz görseller işleme alınacaktır. Devam?')) return;
 
     this.isUpdatingTags = true;
     m.redraw();
@@ -404,9 +430,9 @@ export default class FramioSettingsPage extends ExtensionPage {
         method: 'POST',
         url: app.forum.attribute('apiUrl') + '/framio-update-alt-tags'
     }).then(response => {
-        app.alerts.show({ type: 'success' }, `İşlem tamamlandı. Toplam ${response.updated_count} mesajın ALT etiketi güncellendi.`);
+        app.alerts.show({ type: 'success' }, `Başarılı! Toplam ${response.updated_count} bağlantı güncellendi.`);
     }).catch(error => {
-        app.alerts.show({ type: 'error' }, 'İşlem sırasında bir hata oluştu. Lütfen konsolu kontrol edin.');
+        app.alerts.show({ type: 'error' }, 'Beklenmedik bir hata oluştu.');
     }).finally(() => {
         this.isUpdatingTags = false;
         m.redraw();
@@ -429,13 +455,8 @@ export default class FramioSettingsPage extends ExtensionPage {
     this.images = []; 
     m.redraw();
 
-    const params = {
-        page: { offset: this.offset, limit: this.limit }
-    };
-
-    if (this.searchQuery) {
-        params.filter = { q: this.searchQuery };
-    }
+    const params = { page: { offset: this.offset, limit: this.limit } };
+    if (this.searchQuery) params.filter = { q: this.searchQuery };
 
     app.request({
         method: 'GET',
@@ -450,7 +471,7 @@ export default class FramioSettingsPage extends ExtensionPage {
         }
 
         this.images = result.data.map(img => {
-            let username = 'Misafir / Silinmiş';
+            let username = 'Bilinmiyor';
             if (img.relationships && img.relationships.user && img.relationships.user.data) {
                 const userId = img.relationships.user.data.id;
                 if (users[userId]) username = users[userId].username;
@@ -466,24 +487,6 @@ export default class FramioSettingsPage extends ExtensionPage {
 
         this.isLoading = false;
         m.redraw();
-    });
-  }
-
-  deleteImage(image) {
-    if (!confirm(`${image.attributes.filename} dosyasını silmek istediğinize emin misiniz?`)) return;
-
-    app.request({
-        method: 'DELETE',
-        url: app.forum.attribute('apiUrl') + '/framio-image/' + image.id
-    }).then(() => {
-        this.images = this.images.filter(i => i.id !== image.id);
-        app.alerts.show({ type: 'success' }, 'Görsel silindi.');
-        
-        if (this.images.length === 0 && this.offset > 0) {
-            this.changePage(-1);
-        } else {
-            m.redraw();
-        }
     });
   }
 }
