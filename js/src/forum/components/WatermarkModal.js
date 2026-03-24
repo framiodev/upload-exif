@@ -35,7 +35,7 @@ export default class WatermarkModal extends Modal {
         { id: 'framio_wm_renkli_dikey', label: 'Renkli Dikey', type: 'vertical', style: 'color', icon: 'fas fa-arrows-alt-v', color: '#e74c3c', bg: '#f9f9f9', border: '#e74c3c' },
     ];
 
-    this.processImages();
+    
   }
 
   // Header alanını daraltmak için DOM manipülasyonu
@@ -95,10 +95,10 @@ export default class WatermarkModal extends Modal {
     const isVerticalImage = currentFile.isVertical;
     const currentWatermarkId = currentFile.watermarkStream();
 
-    const mainOptions = isVerticalImage ? this.verticalOptions : this.horizontalOptions;
-    const hiddenOptions = isVerticalImage ? this.horizontalOptions : this.verticalOptions;
-
-    return (
+    
+    const mainOptions = this.watermarks;
+    const hiddenOptions = [];
+return (
       <div className="Modal-body" style={{ padding: '15px', overflow: 'hidden' }}>
         {/* KIRMIZI UYARI */}
         <div style={{ color: '#e74c3c', fontWeight: 'bold', fontStyle: 'italic', textAlign: 'center', marginBottom: '10px', fontSize: '12px', borderBottom: '1px solid #eee', paddingBottom: '5px' }}>
@@ -177,27 +177,7 @@ export default class WatermarkModal extends Modal {
                         {mainOptions.map(opt => this.renderOption(opt, currentFile))}
                     </div>
 
-                    <div style={{ marginTop: '10px', borderTop: '1px dashed #ddd', paddingTop: '5px' }}>
-                        <Button 
-                            className="Button Button--text Button--block" 
-                            icon={this.showHiddenOptions ? "fas fa-chevron-up" : "fas fa-chevron-down"}
-                            onclick={() => this.showHiddenOptions = !this.showHiddenOptions}
-                            style={{fontSize: '12px'}}
-                        >
-                            {this.showHiddenOptions ? 'Diğerleri Gizle' : (isVerticalImage ? 'Yatayları Göster' : 'Dikeyleri Göster')}
-                        </Button>
-
-                        {this.showHiddenOptions && (
-                            <div style={{ marginTop: '5px', animation: 'fadeIn 0.3s' }}>
-                                <div className="Watermark-grid">
-                                    {hiddenOptions.map(opt => this.renderOption(opt, currentFile))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    <div 
-                        className={`Watermark-option full-width ${currentWatermarkId === 'none' ? 'active' : ''}`}
+                    <div className={`Watermark-option full-width ${currentWatermarkId === 'none' ? 'active' : ''}`}
                         onclick={() => currentFile.watermarkStream('none')}
                         style={{ 
                             marginTop: '10px', 
@@ -270,20 +250,11 @@ export default class WatermarkModal extends Modal {
   renderWatermarkOverlay(watermarkId) {
       if (!watermarkId || watermarkId === 'none') return null;
 
-      const baseUrl = app.forum.attribute('baseUrl').replace(/\/$/, '');
-      const src = `${baseUrl}/assets/watermarks/${watermarkId}.png`;
+      const wm = this.watermarks.find(w => w.id === watermarkId);
+      if (!wm) return null;
 
-      let style = {
-          position: 'absolute',
-          bottom: 0, // DÜZELTME: Alt kenar hizalaması
-          left: 0,
-          width: '100%',
-          // height: '100%' // İPTAL: En boy oranını korumak için yükseklik otomatik olmalı
-          pointerEvents: 'none',
-          zIndex: 10
-      };
-
-      return <img src={src} style={style} />;
+      let style = { position: 'absolute', bottom: 0, left: 0, width: '100%', pointerEvents: 'none', zIndex: 10 };
+      return <img src={wm.url} style={style} />;
   }
 
   renderOption(opt, currentFile) {

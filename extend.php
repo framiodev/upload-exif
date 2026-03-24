@@ -29,7 +29,10 @@ return [
         ->get('/framio-images/user', 'framio.user.gallery', UserGalleryController::class)
         ->patch('/framio-image/{id}', 'framio.update', EditImageController::class)
         ->delete('/framio-image/{id}', 'framio.delete', DeleteImageController::class)
-        ->post('/framio-update-alt-tags', 'framio.update-alt-tags', UpdateRetroactiveAltTagsController::class),
+        ->post('/framio-update-alt-tags', 'framio.update-alt-tags', UpdateRetroactiveAltTagsController::class)
+        ->get('/framio-admin-watermarks', 'framio.watermarks.list', \Framio\UploadExif\Api\Controller\Watermark\ListWatermarksController::class)
+        ->post('/framio-admin-watermarks', 'framio.watermarks.upload', \Framio\UploadExif\Api\Controller\Watermark\UploadWatermarkController::class)
+        ->delete('/framio-admin-watermarks/{filename}', 'framio.watermarks.delete', \Framio\UploadExif\Api\Controller\Watermark\DeleteWatermarkController::class),
 
     (new Extend\Formatter)
         ->configure(function (Configurator $config) {

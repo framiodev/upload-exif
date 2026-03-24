@@ -14,12 +14,13 @@ export default class FramioSettingsPage extends ExtensionPage {
       { id: 'general', label: 'Genel Yap�land�rma', icon: 'fas fa-cogs' },
       { id: 'firebase', label: 'Firebase Depolama', icon: 'fas fa-cloud-upload-alt' },
       { id: 'customfields', label: '�zel Alanlar (Fields)', icon: 'fas fa-list' },
+      { id: 'watermarks', label: 'Filigran (�mza)', icon: 'fas fa-stamp' },
       { id: 'seo', label: 'SEO ve ��lemler', icon: 'fas fa-search' },
       { id: 'media', label: 'Medya Y�netimi', icon: 'fas fa-images' }
     ];
 
     this.searchQuery = '';
-    this.images = [];
+    this.images = []; this.adminWatermarks = [];
     this.isLoading = false;
     this.isUpdatingTags = false;
     
@@ -36,7 +37,7 @@ export default class FramioSettingsPage extends ExtensionPage {
         if (stored) this.customFields = JSON.parse(stored);
     } catch (e) {}
 
-    this.loadImages();
+    this.loadImages(); this.loadWatermarks();
   }
 
   content() {
@@ -77,6 +78,7 @@ export default class FramioSettingsPage extends ExtensionPage {
                 {this.activeTab === 'general' && this.renderGeneralTab()}
                 {this.activeTab === 'firebase' && this.renderFirebaseTab()}
                 {this.activeTab === 'customfields' && this.renderCustomFieldsTab()}
+                {this.activeTab === 'watermarks' && this.renderWatermarksTab()}
                 {this.activeTab === 'seo' && this.renderSeoTab()}
                 {this.activeTab === 'media' && this.renderMediaTab()}
             </div>
@@ -353,7 +355,112 @@ export default class FramioSettingsPage extends ExtensionPage {
     );
   }
 
+  
+  loadWatermarks() {
+    app.request({
+        method: 'GET',
+        url: app.forum.attribute('apiUrl') + '/framio-admin-watermarks'
+    }).then(result => {
+        if (result && result.data) {
+            this.adminWatermarks = result.data;
+            m.redraw();
+        }
+    });
+  }
+
+  uploadWatermark(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const data = new FormData();
+      data.append('watermark', file);
+
+      app.request({
+          method: 'POST',
+          url: app.forum.attribute('apiUrl') + '/framio-admin-watermarks',
+          body: data,
+          serialize: raw => raw
+      }).then(response => {
+          this.adminWatermarks.push({
+              filename: response.filename,
+              url: response.url
+          });
+          app.alerts.show({ type: 'success' }, 'Filigran y�klendi.');
+          m.redraw();
+      }).catch(err => {
+          app.alerts.show({ type: 'error' }, 'Y�kleme ba�ar�s�z. Sadece PNG desteklenir.');
+      });
+      e.target.value = '';
+  }
+
+  deleteWatermark(filename) {
+      if (!confirm(filename + ' dosyas�n� silmek istedi�inize emin misiniz?')) return;
+      app.request({
+          method: 'DELETE',
+          url: app.forum.attribute('apiUrl') + '/framio-admin-watermarks?filename=' + encodeURIComponent(filename),
+      }).then(() => {
+          this.adminWatermarks = this.adminWatermarks.filter(w => w.filename !== filename);
+          app.alerts.show({ type: 'success' }, 'Filigran silindi.');
+          m.redraw();
+      });
+  }
+
+  renderWatermarksTab() {
+    return (
+      <div className="Form-group">
+        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>Filigran (Watermark) Y�netimi</h3>
+        <div className="helpText" style={{ marginBottom: '30px', fontSize: '14px', lineHeight: '1.6' }}>
+            Kullan�c�lar�n foto�raf y�klerken se�ebilecekleri �irket logolar�n� / imzalar�n� buradan y�kleyin.<br/>
+            <strong>Tavsiye:</strong> �mzalar�n�z <code>.PNG</code> format�nda olmal� ve arka plan� �effaf (transparan) olmal�d�r. (Maks 1000px geni�lik �nerilir).
+        </div>
+        
+        <div style={{ marginBottom: '30px', padding: '15px', background: '#f8f9fa', borderRadius: '8px', border: '1px solid #e9ecef', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+                <strong>Yeni Filigran Y�kle</strong><br/>
+                <span style={{fontSize:'12px', color:'#777'}}>Sadece �effaf .PNG format�</span>
+            </div>
+            <div style={{ position: 'relative', overflow: 'hidden' }}>
+                <Button className="Button Button--primary" icon="fas fa-upload">Dosya Se� ve Y�kle</Button>
+                <input 
+                    type="file" 
+                    accept="image/png" 
+                    onchange={this.uploadWatermark.bind(this)} 
+                    style={{ position: 'absolute', top: 0, right: 0, margin: 0, padding: 0, fontSize: '20px', cursor: 'pointer', opacity: 0, height: '100%' }}
+                />
+            </div>
+        </div>
+
+        <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', 
+            gap: '20px' 
+        }}>
+            {this.adminWatermarks.length === 0 ? (
+                <div style={{gridColumn: '1 / -1', textAlign: 'center', color: '#999', padding: '40px', fontStyle: 'italic', background: '#f8f9fa', borderRadius: '8px'}}>
+                    Sistemde y�kl� bir filigran bulunmuyor.
+                </div>
+            ) : (
+                this.adminWatermarks.map(wm => (
+                    <div style={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden', background: '#fff' }}>
+                        <div style={{ height: '120px', background: '#e9ecef url("data:image/svg+xml,%3Csvg width=\\\'10\\\' height=\\\'10\\\' viewBox=\\\'0 0 10 10\\\' xmlns=\\\'http://www.w3.org/2000/svg\\\'%3E%3Cpath fill=\\\'%23d5d5d5\\\' fill-rule=\\\'evenodd\\\' d=\\\'M0 0h5v5H0V0zm5 5h5v5H5V5z\\\'/%3E%3C/svg%3E") repeat', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px' }}>
+                            <img src={wm.url} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                        </div>
+                        <div style={{ padding: '10px', fontSize: '12px', borderTop: '1px solid #ddd', textAlign: 'center' }}>
+                            <div style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', marginBottom: '8px', fontWeight: 'bold' }}>{wm.filename}</div>
+                            <Button className="Button Button--danger Button--small Button--block" icon="fas fa-trash-alt" onclick={() => this.deleteWatermark(wm.filename)}>
+                                Sil
+                            </Button>
+                        </div>
+                    </div>
+                ))
+            )}
+        </div>
+      </div>
+    );
+  }
+
   /* --- ACTIONS --- */
+
 
   startEditName(image, currentName) {
     this.editingImageId = image.id;
@@ -437,18 +544,18 @@ export default class FramioSettingsPage extends ExtensionPage {
 
   performSearch() {
     this.offset = 0;
-    this.loadImages();
+    this.loadImages(); this.loadWatermarks();
   }
 
   changePage(direction) {
     this.offset += direction * this.limit;
     if (this.offset < 0) this.offset = 0;
-    this.loadImages();
+    this.loadImages(); this.loadWatermarks();
   }
 
   loadImages() {
     this.isLoading = true;
-    this.images = []; 
+    this.images = []; this.adminWatermarks = []; 
     m.redraw();
 
     const params = { page: { offset: this.offset, limit: this.limit } };
