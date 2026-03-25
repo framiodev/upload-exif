@@ -14,31 +14,33 @@ export default class WatermarkModal extends Modal {
     this.processedFiles = [];
     this.loadingImages = true;
     this.activeIndex = 0;
-    this.showHiddenOptions = false;
-    
-    // Animasyon Durumu
     this.animating = false;
+    this.watermarks = [];
 
-    // --- İMZA SEÇENEKLERİ ---
-    this.horizontalOptions = [
-        { id: 'framio_wm_beyaz_yatay_orta', label: 'Beyaz - Orta',  type: 'center', style: 'white', icon: 'fas fa-minus', color: '#333', bg: '#fff', border: '#ddd' },
-        { id: 'framio_wm_siyah_yatay_orta', label: 'Siyah - Orta',  type: 'center', style: 'black', icon: 'fas fa-minus', color: '#fff', bg: '#333', border: '#333' },
-        { id: 'framio_wm_renkli_yatay_orta', label: 'Renkli - Orta', type: 'center', style: 'color', icon: 'fas fa-minus', color: '#e74c3c', bg: '#f9f9f9', border: '#e74c3c' },
-        { id: 'framio_wm_beyaz_yatay_kose', label: 'Beyaz - Köşe',  type: 'corner', style: 'white', icon: 'fas fa-external-link-alt', color: '#333', bg: '#fff', border: '#ddd' },
-        { id: 'framio_wm_siyah_yatay_kose', label: 'Siyah - Köşe',  type: 'corner', style: 'black', icon: 'fas fa-external-link-alt', color: '#fff', bg: '#333', border: '#333' },
-        { id: 'framio_wm_renkli_yatay_kose', label: 'Renkli - Köşe', type: 'corner', style: 'color', icon: 'fas fa-external-link-alt', color: '#e74c3c', bg: '#f9f9f9', border: '#e74c3c' },
-    ];
-
-    this.verticalOptions = [
-        { id: 'framio_wm_beyaz_dikey',  label: 'Beyaz Dikey',  type: 'vertical', style: 'white', icon: 'fas fa-arrows-alt-v', color: '#333', bg: '#fff', border: '#ddd' },
-        { id: 'framio_wm_siyah_dikey',  label: 'Siyah Dikey',  type: 'vertical', style: 'black', icon: 'fas fa-arrows-alt-v', color: '#fff', bg: '#333', border: '#333' },
-        { id: 'framio_wm_renkli_dikey', label: 'Renkli Dikey', type: 'vertical', style: 'color', icon: 'fas fa-arrows-alt-v', color: '#e74c3c', bg: '#f9f9f9', border: '#e74c3c' },
-    ];
-
-    
+    this.processImages();
+    this.loadWatermarks();
   }
 
-  // Header alanını daraltmak için DOM manipülasyonu
+  loadWatermarks() {
+    app.request({
+        method: 'GET',
+        url: app.forum.attribute('apiUrl') + '/framio-admin-watermarks'
+    }).then(result => {
+        if (result && result.data) {
+            this.watermarks = result.data.map(wm => ({
+                id: wm.filename,
+                label: wm.filename.split('-')[0], // Dosya adının ilk kısmı
+                url: wm.url,
+                bg: '#fff',
+                color: '#333',
+                border: '#ddd',
+                icon: 'fas fa-stamp'
+            }));
+            m.redraw();
+        }
+    });
+  }
+
   oncreate(vnode) {
       super.oncreate(vnode);
       const header = vnode.dom.querySelector('.Modal-header');
@@ -83,7 +85,6 @@ export default class WatermarkModal extends Modal {
   }
 
   className() { return 'WatermarkModal'; }
-  
   title() { return `İmza Seçimi (${this.activeIndex + 1}/${this.originalFiles.length})`; }
 
   content() {
@@ -94,20 +95,15 @@ export default class WatermarkModal extends Modal {
     const currentFile = this.processedFiles[this.activeIndex];
     const isVerticalImage = currentFile.isVertical;
     const currentWatermarkId = currentFile.watermarkStream();
-
-    
     const mainOptions = this.watermarks;
-    const hiddenOptions = [];
-return (
+
+    return (
       <div className="Modal-body" style={{ padding: '15px', overflow: 'hidden' }}>
-        {/* KIRMIZI UYARI */}
-        <div style={{ color: '#e74c3c', fontWeight: 'bold', fontStyle: 'italic', textAlign: 'center', marginBottom: '10px', fontSize: '12px', borderBottom: '1px solid #eee', paddingBottom: '5px' }}>
-            Crop yapılmış fotoğraflarda imzalar düzgün eklenmeyebilir. Bu tarz durumlarda cihazınızdaki görsel düzenleme araçlarını kullanınız.
+        <div style={{ color: '#e74c3c', fontWeight: 'bold', fontStyle: 'italic', textAlign: 'center', marginBottom: '10px', fontSize: '11px', borderBottom: '1px solid #eee', paddingBottom: '5px' }}>
+            Crop yapılmış fotoğraflarda imzalar düzgün eklenmeyebilir.
         </div>
 
-        {/* GEÇİŞ BUTONLARI VE İÇERİK */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
-             {/* SOL OK */}
              <Button 
                 className="Button Button--icon Button--link" 
                 icon="fas fa-chevron-left" 
@@ -116,26 +112,17 @@ return (
                 style={{ fontSize: '20px', color: '#333', opacity: this.activeIndex === 0 ? 0.3 : 1, visibility: this.processedFiles.length <= 1 ? 'hidden' : 'visible' }}
             />
 
-            {/* ANİMASYONLU İÇERİK ALANI (Görsel + Seçenekler) */}
             <div style={{ 
                 flex: 1, 
                 opacity: this.animating ? 0 : 1, 
                 transform: this.animating ? 'scale(0.98)' : 'scale(1)',
                 transition: 'all 0.2s ease-in-out'
             }}>
-                
-                {/* --- ÖNİZLEME --- */}
                 <div style={{ textAlign: 'center', marginBottom: '10px', position: 'relative' }}>
                     <div style={{ position: 'relative', display: 'inline-block' }}>
                         <img 
                             src={currentFile.src} 
-                            style={{ 
-                                display: 'block', 
-                                maxHeight: '250px',
-                                maxWidth: '100%', 
-                                height: 'auto',
-                                objectFit: 'contain'
-                            }} 
+                            style={{ display: 'block', maxHeight: '250px', maxWidth: '100%', height: 'auto', objectFit: 'contain' }} 
                         />
                         {this.renderWatermarkOverlay(currentWatermarkId)}
                     </div>
@@ -153,27 +140,17 @@ return (
                     </div>
                 </div>
 
-                {/* --- SEÇİM ALANI --- */}
                 <div className="Watermark-selection-area" style={{ background: '#f9f9f9', padding: '10px', borderRadius: '8px' }}>
-                    
                     <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'10px'}}>
-                        <h4 className="Watermark-group-title" style={{margin:0, fontSize: '14px'}}>
-                            <i className={isVerticalImage ? "fas fa-portrait" : "fas fa-image"}></i> 
-                            {isVerticalImage ? ' Dikey İmzalar' : ' Yatay İmzalar'}
-                        </h4>
-                        
+                        <h4 style={{margin:0, fontSize: '13px'}}>İmza Seçin</h4>
                         {this.processedFiles.length > 1 && (
-                            <Button 
-                                className="Button Button--primary Button--small" 
-                                onclick={() => this.applyToAll(currentWatermarkId)}
-                                style={{fontSize: '11px', padding: '2px 8px'}}
-                            >
+                            <Button className="Button Button--primary Button--small" onclick={() => this.applyToAll(currentWatermarkId)} style={{fontSize: '11px', padding: '2px 8px'}}>
                                 Tümüne Uygula
                             </Button>
                         )}
                     </div>
                     
-                    <div className="Watermark-grid">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '8px', maxHeight: '120px', overflowY: 'auto', padding: '5px' }}>
                         {mainOptions.map(opt => this.renderOption(opt, currentFile))}
                     </div>
 
@@ -185,17 +162,17 @@ return (
                             color: '#666', 
                             border: '1px solid #ddd', 
                             padding: '8px',
-                            boxShadow: currentWatermarkId === 'none' ? '0 0 0 2px #666' : 'none'
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            borderRadius: '4px',
+                            fontWeight: currentWatermarkId === 'none' ? 'bold' : 'normal'
                         }}
                     >
-                        <i className="fas fa-ban"></i>
-                        <span>İmza Olmadan Yükle</span>
-                        {currentWatermarkId === 'none' ? <i className="fas fa-check-circle selected-icon" style={{color: '#666'}}></i> : null}
+                        <i className="fas fa-ban"></i> İmzasız Yükle
                     </div>
                 </div>
-
             </div>
-             {/* SAĞ OK */}
+
              <Button 
                 className="Button Button--icon Button--link" 
                 icon="fas fa-chevron-right" 
@@ -214,9 +191,8 @@ return (
     );
   }
 
-  // --- FONKSİYONLAR ---
-
   changeSlide(direction) {
+      if (this.animating) return;
       this.animating = true;
       m.redraw();
       
@@ -226,22 +202,16 @@ return (
           } else if (direction === 'prev' && this.activeIndex > 0) {
               this.activeIndex--;
           }
-          this.showHiddenOptions = false;
           this.animating = false;
           m.redraw();
       }, 200);
   }
 
-  nextSlide() {
-      this.changeSlide('next');
-  }
-
-  prevSlide() {
-      this.changeSlide('prev');
-  }
+  nextSlide() { this.changeSlide('next'); }
+  prevSlide() { this.changeSlide('prev'); }
 
   applyToAll(watermarkId) {
-      if (confirm('Seçilen imza türü listedeki TÜM fotoğraflara uygulanacak. Emin misiniz?')) {
+      if (confirm('Seçilen imza türü tüm fotoğraflara uygulanacak. Emin misiniz?')) {
           this.processedFiles.forEach(file => file.watermarkStream(watermarkId));
           m.redraw();
       }
@@ -249,38 +219,35 @@ return (
 
   renderWatermarkOverlay(watermarkId) {
       if (!watermarkId || watermarkId === 'none') return null;
-
       const wm = this.watermarks.find(w => w.id === watermarkId);
       if (!wm) return null;
-
-      let style = { position: 'absolute', bottom: 0, left: 0, width: '100%', pointerEvents: 'none', zIndex: 10 };
-      return <img src={wm.url} style={style} />;
+      return <img src={wm.url} style={{ position: 'absolute', bottom: '5px', right: '5px', width: '30%', pointerEvents: 'none', zIndex: 10, opacity: 0.8 }} />;
   }
 
   renderOption(opt, currentFile) {
       const isSelected = currentFile.watermarkStream() === opt.id;
-      const activeBorderColor = opt.style === 'white' ? '#999' : (opt.style === 'black' ? '#000' : '#c0392b');
-
       return (
         <div 
-            className={`Watermark-option`}
             onclick={() => currentFile.watermarkStream(opt.id)}
             style={{ 
                 background: opt.bg, 
                 color: opt.color, 
-                borderColor: isSelected ? activeBorderColor : opt.border,
-                borderWidth: isSelected ? '3px' : '1px',
+                borderColor: isSelected ? '#4D698E' : opt.border,
+                borderWidth: isSelected ? '2px' : '1px',
                 borderStyle: 'solid',
-                transform: isSelected ? 'scale(1.02)' : 'scale(1)',
-                boxShadow: isSelected ? '0 4px 10px rgba(0,0,0,0.1)' : 'none',
-                position: 'relative',
-                padding: '8px',
-                fontSize: '12px'
+                padding: '5px',
+                fontSize: '11px',
+                textAlign: 'center',
+                cursor: 'pointer',
+                borderRadius: '4px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '3px'
             }}
         >
-            <i className={opt.icon}></i>
-            <span>{opt.label}</span>
-            {isSelected ? <i className="fas fa-check-circle selected-icon" style={{color: activeBorderColor}}></i> : null}
+            <img src={opt.url} style={{ width: '100%', height: '30px', objectFit: 'contain' }} />
+            <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', width: '100%' }}>{opt.label}</span>
         </div>
       );
   }

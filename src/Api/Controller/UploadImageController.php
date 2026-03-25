@@ -107,7 +107,7 @@ class UploadImageController implements RequestHandlerInterface
 
         // Watermark (Framio Standart 9 İmza)
         if ($watermarkId !== 'none') {
-            $wmPath = public_path('assets/watermarks/' . $watermarkId . '.png');
+            $wmPath = $this->paths->public . '/assets/watermarks/' . $watermarkId;
             if (file_exists($wmPath)) {
                 $wm = $manager->make($wmPath);
                 $targetWidth = $imgOriginal->width();
