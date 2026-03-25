@@ -11,16 +11,17 @@ export default class FramioSettingsPage extends ExtensionPage {
 
     this.activeTab = 'general';
     this.tabs = [
-      { id: 'general', label: 'Genel Yap�land�rma', icon: 'fas fa-cogs' },
+      { id: 'general', label: 'Genel Yapılandırma', icon: 'fas fa-cogs' },
       { id: 'firebase', label: 'Firebase Depolama', icon: 'fas fa-cloud-upload-alt' },
-      { id: 'customfields', label: '�zel Alanlar (Fields)', icon: 'fas fa-list' },
-      { id: 'watermarks', label: 'Filigran (�mza)', icon: 'fas fa-stamp' },
-      { id: 'seo', label: 'SEO ve ��lemler', icon: 'fas fa-search' },
-      { id: 'media', label: 'Medya Y�netimi', icon: 'fas fa-images' }
+      { id: 'customfields', label: 'Özel Alanlar (Fields)', icon: 'fas fa-list' },
+      { id: 'watermarks', label: 'Filigran (İmza)', icon: 'fas fa-stamp' },
+      { id: 'seo', label: 'SEO ve İşlemler', icon: 'fas fa-search' },
+      { id: 'media', label: 'Medya Yönetimi', icon: 'fas fa-images' }
     ];
 
     this.searchQuery = '';
-    this.images = []; this.adminWatermarks = [];
+    this.images = [];
+    this.adminWatermarks = [];
     this.isLoading = false;
     this.isUpdatingTags = false;
     
@@ -37,7 +38,8 @@ export default class FramioSettingsPage extends ExtensionPage {
         if (stored) this.customFields = JSON.parse(stored);
     } catch (e) {}
 
-    this.loadImages(); this.loadWatermarks();
+    this.loadImages();
+    this.loadWatermarks();
   }
 
   content() {
@@ -69,7 +71,7 @@ export default class FramioSettingsPage extends ExtensionPage {
               
               <div style={{ marginTop: '20px' }}>
                 <Button className="Button Button--primary" onclick={this.save.bind(this)} icon="fas fa-save" style={{ width: '100%', padding: '12px', fontSize: '15px', fontWeight: 'bold' }}>
-                    Ayarlar� Kaydet
+                    Ayarları Kaydet
                 </Button>
               </div>
             </div>
@@ -92,29 +94,29 @@ export default class FramioSettingsPage extends ExtensionPage {
   renderGeneralTab() {
     return (
       <div className="Form-group">
-        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '25px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>Genel Yap�land�rma</h3>
+        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '25px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>Genel Yapılandırma</h3>
         {this.buildSettingComponent({
             type: 'number',
             setting: 'framio-upload-exif.resize_width',
-            label: 'Maksimum Foto�raf Geni�li�i (px)',
+            label: 'Maksimum Fotoğraf Genişliği (px)',
             placeholder: '3840'
         })}
         {this.buildSettingComponent({
             type: 'number',
             setting: 'framio-upload-exif.compression_quality',
-            label: 'S�k��t�rma Kalitesi (0-100)',
+            label: 'Sıkıştırma Kalitesi (0-100)',
             placeholder: '90'
         })}
          {this.buildSettingComponent({
             type: 'number',
             setting: 'framio-upload-exif.thumb_width',
-            label: 'Thumbnail Geni�li�i',
+            label: 'Thumbnail Genişliği',
             placeholder: '1024'
         })}
          {this.buildSettingComponent({
             type: 'number',
             setting: 'framio-upload-exif.mini_width',
-            label: 'Mini Galeri Geni�li�i',
+            label: 'Mini Galeri Genişliği',
             placeholder: '250'
         })}
       </div>
@@ -124,18 +126,18 @@ export default class FramioSettingsPage extends ExtensionPage {
   renderFirebaseTab() {
     return (
       <div className="Form-group">
-        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>Firebase Depolama Ayarlar�</h3>
-        <div className="helpText" style={{ marginBottom: '25px', fontSize: '14px', lineHeight: '1.5' }}>G�rsellerin y�klenece�i Firebase Storage (Google Cloud) kimlik ve kova bilgilerini giriniz. Kimlik bilgilerini bo� b�rak�rsan�z sistem <code>storage/firebase-auth.json</code> dosyas�n� aramaya devam eder.</div>
+        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>Firebase Depolama Ayarları</h3>
+        <div className="helpText" style={{ marginBottom: '25px', fontSize: '14px', lineHeight: '1.5' }}>Görsellerin yükleneceği Firebase Storage (Google Cloud) kimlik ve kova bilgilerini giriniz. Kimlik bilgilerini boş bırakırsanız sistem <code>storage/firebase-auth.json</code> dosyasını aramaya devam eder.</div>
         
         {this.buildSettingComponent({
             type: 'text',
             setting: 'framio-upload-exif.firebase_bucket',
-            label: 'Firebase Bucket Ad�',
+            label: 'Firebase Bucket Adı',
             placeholder: 'ornek-proje.appspot.com'
         })}
         
         <div className="Form-group" style={{ marginTop: '25px' }}>
-          <label style={{ fontWeight: 'bold' }}>Firebase Kimlik (JSON) ��eri�i</label>
+          <label style={{ fontWeight: 'bold' }}>Firebase Kimlik (JSON) İçeriği</label>
           <textarea 
             className="FormControl" 
             rows="10" 
@@ -151,25 +153,25 @@ export default class FramioSettingsPage extends ExtensionPage {
   renderCustomFieldsTab() {
     return (
       <div className="Form-group">
-        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>Dinamik �zel Alanlar (Custom Fields)</h3>
+        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>Dinamik Özel Alanlar (Custom Fields)</h3>
         <div className="helpText" style={{ marginBottom: '30px', fontSize: '14px', lineHeight: '1.6' }}>
-            Foto�raf y�klerken kullan�c�lara sorulacak dinamik etiket alanlar� olu�turun. <strong>(A��r vas�ta, gezi, emlak vb. her t�rl� siteye uyar)</strong><br/>
-            <strong>Alan Ad�:</strong> Formda g�r�necek etiket (�rn: <code>Lokasyon</code>, <code>Kamera Modeli</code>).<br/>
-            <strong>Se�enekler:</strong> Belirli se�enekler sunmak isterseniz araya virg�l koyarak yaz�n (�rn: <code>Nikon, Canon, Sony</code>). Bo� b�rak�l�rsa serbest metin giri�i olur.
+            Fotoğraf yüklerken kullanıcılara sorulacak dinamik etiket alanları oluşturun. <strong>(Ağır vasıta, gezi, emlak vb. her türlü siteye uyar)</strong><br/>
+            <strong>Alan Adı:</strong> Formda görünecek etiket (örn: <code>Lokasyon</code>, <code>Kamera Modeli</code>).<br/>
+            <strong>Seçenekler:</strong> Belirli seçenekler sunmak isterseniz araya virgül koyarak yazın (örn: <code>Nikon, Canon, Sony</code>). Boş bırakılırsa serbest metin girişi olur.
         </div>
         
         {this.customFields.map((field, index) => (
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px', alignItems: 'center', background: '#f8f9fa', padding: '15px', borderRadius: '8px', border: '1px solid #e9ecef' }}>
-                <input className="FormControl" placeholder="Alan Ad� (�rn: Lokasyon)" value={field.label} oninput={e => field.label = e.target.value} style={{ flex: 1 }} />
-                <input className="FormControl" placeholder="Sadece �u url de g�ster (Ops. d/77)" value={field.tags} oninput={e => field.tags = e.target.value} style={{ flex: 1 }} />
-                <input className="FormControl" placeholder="Dropdown �n Tan�ml� Se�enekleri (Virg�lle ay�r)" value={field.options} oninput={e => field.options = e.target.value} style={{ flex: 1.5 }} />
+                <input className="FormControl" placeholder="Alan Adı (Örn: Lokasyon)" value={field.label} oninput={e => field.label = e.target.value} style={{ flex: 1 }} />
+                <input className="FormControl" placeholder="Sadece şu url de göster (Ops. d/77)" value={field.tags} oninput={e => field.tags = e.target.value} style={{ flex: 1 }} />
+                <input className="FormControl" placeholder="Dropdown Ön Tanımlı Seçenekleri (Virgülle ayır)" value={field.options} oninput={e => field.options = e.target.value} style={{ flex: 1.5 }} />
                 <Button className="Button Button--danger Button--icon" onclick={() => this.customFields.splice(index, 1)} icon="fas fa-trash-alt" title="Sil"></Button>
             </div>
         ))}
         
         <div style={{ marginTop: '25px' }}>
             <Button className="Button" onclick={() => this.customFields.push({label: '', tags: '', options: ''})} icon="fas fa-plus">
-                Yeni �zel Alan Ekle
+                Yeni Özel Alan Ekle
             </Button>
         </div>
       </div>
@@ -179,9 +181,9 @@ export default class FramioSettingsPage extends ExtensionPage {
   renderSeoTab() {
     return (
       <div className="Form-group">
-        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>SEO ve Toplu ��lemler</h3>
+        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>SEO ve Toplu İşlemler</h3>
         <div className="helpText" style={{ marginBottom: '30px', fontSize: '14px', lineHeight: '1.6' }}>
-            Forumda mevcut olan t�m foto�raflar� tarar ve mesaj i�erisine girilmi� olan k�nye bilgilerini bularak foto�raflar�n <strong>ALT</strong> etiketlerine otomatik olarak uygular. Sitenizin arama motorlar�ndaki performans�n� art�rmak i�in bu i�lemi yapabilirsiniz.
+            Forumda mevcut olan tüm fotoğrafları tarar ve mesaj içerisine girilmiş olan künye bilgilerini bularak fotoğrafların <strong>ALT</strong> etiketlerine otomatik olarak uygular. Sitenizin arama motorlarındaki performansını artırmak için bu işlemi yapabilirsiniz.
         </div>
         <Button 
             className="Button Button--warning" 
@@ -190,8 +192,111 @@ export default class FramioSettingsPage extends ExtensionPage {
             icon="fas fa-sync-alt"
             style={{ padding: '10px 20px', fontSize: '15px' }}
         >
-            Eski ALT Etiketlerini Topluca G�ncelle
+            Eski ALT Etiketlerini Topluca Güncelle
         </Button>
+      </div>
+    );
+  }
+
+  loadWatermarks() {
+    app.request({
+        method: 'GET',
+        url: app.forum.attribute('apiUrl') + '/framio-admin-watermarks'
+    }).then(result => {
+        if (result && result.data) {
+            this.adminWatermarks = result.data;
+            m.redraw();
+        }
+    });
+  }
+
+  uploadWatermark(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const data = new FormData();
+      data.append('watermark', file);
+
+      app.request({
+          method: 'POST',
+          url: app.forum.attribute('apiUrl') + '/framio-admin-watermarks',
+          body: data,
+          serialize: raw => raw
+      }).then(response => {
+          this.adminWatermarks.push({
+              filename: response.filename,
+              url: response.url
+          });
+          app.alerts.show({ type: 'success' }, 'Filigran yüklendi.');
+          m.redraw();
+      }).catch(err => {
+          app.alerts.show({ type: 'error' }, 'Yükleme başarısız. Sadece PNG desteklenir.');
+      });
+      e.target.value = '';
+  }
+
+  deleteWatermark(filename) {
+      if (!confirm(filename + ' dosyasını silmek istediğinize emin misiniz?')) return;
+      app.request({
+          method: 'DELETE',
+          url: app.forum.attribute('apiUrl') + '/framio-admin-watermarks?filename=' + encodeURIComponent(filename),
+      }).then(() => {
+          this.adminWatermarks = this.adminWatermarks.filter(w => w.filename !== filename);
+          app.alerts.show({ type: 'success' }, 'Filigran silindi.');
+          m.redraw();
+      });
+  }
+
+  renderWatermarksTab() {
+    return (
+      <div className="Form-group">
+        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>Filigran (Watermark) Yönetimi</h3>
+        <div className="helpText" style={{ marginBottom: '30px', fontSize: '14px', lineHeight: '1.6' }}>
+            Kullanıcıların fotoğraf yüklerken seçebilecekleri şirket logolarını / imzalarını buradan yükleyin.<br/>
+            <strong>Tavsiye:</strong> İmzalarınız <code>.PNG</code> formatında olmalı ve arka planı şeffaf (transparan) olmalıdır. (Maks 1000px genişlik önerilir).
+        </div>
+        
+        <div style={{ marginBottom: '30px', padding: '15px', background: '#f8f9fa', borderRadius: '8px', border: '1px solid #e9ecef', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+                <strong>Yeni Filigran Yükle</strong><br/>
+                <span style={{fontSize:'12px', color:'#777'}}>Sadece şeffaf .PNG formatı</span>
+            </div>
+            <div style={{ position: 'relative', overflow: 'hidden' }}>
+                <Button className="Button Button--primary" icon="fas fa-upload">Dosya Seç ve Yükle</Button>
+                <input 
+                    type="file" 
+                    accept="image/png" 
+                    onchange={this.uploadWatermark.bind(this)} 
+                    style={{ position: 'absolute', top: 0, right: 0, margin: 0, padding: 0, fontSize: '20px', cursor: 'pointer', opacity: 0, height: '100%' }}
+                />
+            </div>
+        </div>
+
+        <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', 
+            gap: '20px' 
+        }}>
+            {this.adminWatermarks.length === 0 ? (
+                <div style={{gridColumn: '1 / -1', textAlign: 'center', color: '#999', padding: '40px', fontStyle: 'italic', background: '#f8f9fa', borderRadius: '8px'}}>
+                    Sistemde yüklü bir filigran bulunmuyor.
+                </div>
+            ) : (
+                this.adminWatermarks.map(wm => (
+                    <div style={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden', background: '#fff' }}>
+                        <div style={{ height: '120px', background: '#e9ecef', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px' }}>
+                            <img src={wm.url} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                        </div>
+                        <div style={{ padding: '10px', fontSize: '12px', borderTop: '1px solid #ddd', textAlign: 'center' }}>
+                            <div style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', marginBottom: '8px', fontWeight: 'bold' }}>{wm.filename}</div>
+                            <Button className="Button Button--danger Button--small Button--block" icon="fas fa-trash-alt" onclick={() => this.deleteWatermark(wm.filename)}>
+                                Sil
+                            </Button>
+                        </div>
+                    </div>
+                ))
+            )}
+        </div>
       </div>
     );
   }
@@ -209,13 +314,13 @@ export default class FramioSettingsPage extends ExtensionPage {
             borderBottom: '1px solid #eee',
             paddingBottom: '15px'
         }}>
-            <h3 className="Settings-title" style={{ margin: 0 }}>Medya Y�netimi</h3>
+            <h3 className="Settings-title" style={{ margin: 0 }}>Medya Yönetimi</h3>
             
             <div className="MediaManager-search" style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
                 <input 
                     className="FormControl" 
                     type="text" 
-                    placeholder="Dosya ad� veya kullan�c� ara..." 
+                    placeholder="Dosya adı veya kullanıcı ara..." 
                     value={this.searchQuery}
                     oninput={e => this.searchQuery = e.target.value}
                     onkeydown={e => { if (e.key === 'Enter') this.performSearch(); }}
@@ -239,13 +344,13 @@ export default class FramioSettingsPage extends ExtensionPage {
                 </div>
             ) : this.images.length === 0 ? (
                 <div style={{gridColumn: '1 / -1', textAlign: 'center', color: '#999', padding: '60px', fontStyle: 'italic', background: '#f8f9fa', borderRadius: '8px'}}>
-                    Kriterlere uygun g�rsel bulunamad�.
+                    Kriterlere uygun görsel bulunamadı.
                 </div>
             ) : (
                 this.images.map(image => {
                     const thumbUrl = image.attributes.thumb_path || image.attributes.url;
                     const isEditing = this.editingImageId === image.id;
-                    const filenameWithoutExt = image.attributes.filename ? image.attributes.filename.replace(/.[^/.]+$/, '') : '';
+                    const filenameWithoutExt = image.attributes.filename ? image.attributes.filename.replace(/\.[^/.]+$/, '') : '';
                     
                     return (
                         <div className="MediaManager-card" style={{
@@ -320,9 +425,9 @@ export default class FramioSettingsPage extends ExtensionPage {
                                     onclick={() => this.startEditName(image, filenameWithoutExt)}
                                     style={{flex: 1, color: '#2196F3', borderColor: '#2196F3'}}
                                     disabled={this.isSavingName}
-                                    title="Dosya Ad� D�zenle"
+                                    title="Dosya Adı Düzenle"
                                 >
-                                    D�zenle
+                                    Düzenle
                                 </Button>
                                 <Button 
                                     className="Button Button--danger Button--small" 
@@ -342,7 +447,7 @@ export default class FramioSettingsPage extends ExtensionPage {
 
         <div className="MediaManager-footer" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '20px', alignItems: 'center' }}>
             <Button className="Button" icon="fas fa-chevron-left" disabled={this.offset === 0} onclick={() => this.changePage(-1)}>
-                �nceki
+                Önceki
             </Button>
             <span style={{fontWeight: 'bold', color: '#666', fontSize: '15px'}}>
                 {this.images.length > 0 ? `${this.offset + 1} - ${this.offset + this.images.length}` : '0'}
@@ -355,112 +460,7 @@ export default class FramioSettingsPage extends ExtensionPage {
     );
   }
 
-  
-  loadWatermarks() {
-    app.request({
-        method: 'GET',
-        url: app.forum.attribute('apiUrl') + '/framio-admin-watermarks'
-    }).then(result => {
-        if (result && result.data) {
-            this.adminWatermarks = result.data;
-            m.redraw();
-        }
-    });
-  }
-
-  uploadWatermark(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const data = new FormData();
-      data.append('watermark', file);
-
-      app.request({
-          method: 'POST',
-          url: app.forum.attribute('apiUrl') + '/framio-admin-watermarks',
-          body: data,
-          serialize: raw => raw
-      }).then(response => {
-          this.adminWatermarks.push({
-              filename: response.filename,
-              url: response.url
-          });
-          app.alerts.show({ type: 'success' }, 'Filigran y�klendi.');
-          m.redraw();
-      }).catch(err => {
-          app.alerts.show({ type: 'error' }, 'Y�kleme ba�ar�s�z. Sadece PNG desteklenir.');
-      });
-      e.target.value = '';
-  }
-
-  deleteWatermark(filename) {
-      if (!confirm(filename + ' dosyas�n� silmek istedi�inize emin misiniz?')) return;
-      app.request({
-          method: 'DELETE',
-          url: app.forum.attribute('apiUrl') + '/framio-admin-watermarks?filename=' + encodeURIComponent(filename),
-      }).then(() => {
-          this.adminWatermarks = this.adminWatermarks.filter(w => w.filename !== filename);
-          app.alerts.show({ type: 'success' }, 'Filigran silindi.');
-          m.redraw();
-      });
-  }
-
-  renderWatermarksTab() {
-    return (
-      <div className="Form-group">
-        <h3 className="Settings-title" style={{ marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>Filigran (Watermark) Y�netimi</h3>
-        <div className="helpText" style={{ marginBottom: '30px', fontSize: '14px', lineHeight: '1.6' }}>
-            Kullan�c�lar�n foto�raf y�klerken se�ebilecekleri �irket logolar�n� / imzalar�n� buradan y�kleyin.<br/>
-            <strong>Tavsiye:</strong> �mzalar�n�z <code>.PNG</code> format�nda olmal� ve arka plan� �effaf (transparan) olmal�d�r. (Maks 1000px geni�lik �nerilir).
-        </div>
-        
-        <div style={{ marginBottom: '30px', padding: '15px', background: '#f8f9fa', borderRadius: '8px', border: '1px solid #e9ecef', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-                <strong>Yeni Filigran Y�kle</strong><br/>
-                <span style={{fontSize:'12px', color:'#777'}}>Sadece �effaf .PNG format�</span>
-            </div>
-            <div style={{ position: 'relative', overflow: 'hidden' }}>
-                <Button className="Button Button--primary" icon="fas fa-upload">Dosya Se� ve Y�kle</Button>
-                <input 
-                    type="file" 
-                    accept="image/png" 
-                    onchange={this.uploadWatermark.bind(this)} 
-                    style={{ position: 'absolute', top: 0, right: 0, margin: 0, padding: 0, fontSize: '20px', cursor: 'pointer', opacity: 0, height: '100%' }}
-                />
-            </div>
-        </div>
-
-        <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', 
-            gap: '20px' 
-        }}>
-            {this.adminWatermarks.length === 0 ? (
-                <div style={{gridColumn: '1 / -1', textAlign: 'center', color: '#999', padding: '40px', fontStyle: 'italic', background: '#f8f9fa', borderRadius: '8px'}}>
-                    Sistemde y�kl� bir filigran bulunmuyor.
-                </div>
-            ) : (
-                this.adminWatermarks.map(wm => (
-                    <div style={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden', background: '#fff' }}>
-                        <div style={{ height: '120px', background: '#e9ecef url("data:image/svg+xml,%3Csvg width=\\\'10\\\' height=\\\'10\\\' viewBox=\\\'0 0 10 10\\\' xmlns=\\\'http://www.w3.org/2000/svg\\\'%3E%3Cpath fill=\\\'%23d5d5d5\\\' fill-rule=\\\'evenodd\\\' d=\\\'M0 0h5v5H0V0zm5 5h5v5H5V5z\\\'/%3E%3C/svg%3E") repeat', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px' }}>
-                            <img src={wm.url} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-                        </div>
-                        <div style={{ padding: '10px', fontSize: '12px', borderTop: '1px solid #ddd', textAlign: 'center' }}>
-                            <div style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', marginBottom: '8px', fontWeight: 'bold' }}>{wm.filename}</div>
-                            <Button className="Button Button--danger Button--small Button--block" icon="fas fa-trash-alt" onclick={() => this.deleteWatermark(wm.filename)}>
-                                Sil
-                            </Button>
-                        </div>
-                    </div>
-                ))
-            )}
-        </div>
-      </div>
-    );
-  }
-
   /* --- ACTIONS --- */
-
 
   startEditName(image, currentName) {
     this.editingImageId = image.id;
@@ -477,11 +477,11 @@ export default class FramioSettingsPage extends ExtensionPage {
   saveImageName(image) {
     const newName = this.editingName.trim();
     if (!newName) {
-      app.alerts.show({ type: 'error' }, 'Dosya ad� bo� olamaz.');
+      app.alerts.show({ type: 'error' }, 'Dosya adı boş olamaz.');
       return;
     }
 
-    const currentNameWithoutExt = image.attributes.filename ? image.attributes.filename.replace(/.[^/.]+$/, '') : '';
+    const currentNameWithoutExt = image.attributes.filename ? image.attributes.filename.replace(/\.[^/.]+$/, '') : '';
     if (newName === currentNameWithoutExt) {
       this.cancelEditName();
       return;
@@ -499,14 +499,14 @@ export default class FramioSettingsPage extends ExtensionPage {
       image.attributes.url = response.thumb_path || response.url;
       image.attributes.thumb_path = response.thumb_path;
       
-      app.alerts.show({ type: 'success' }, 'Dosya ad� ba�ar�yla g�ncellendi.');
+      app.alerts.show({ type: 'success' }, 'Dosya adı başarıyla güncellendi.');
       
       this.editingImageId = null;
       this.editingName = '';
       this.isSavingName = false;
       m.redraw();
     }).catch(error => {
-      const errorMsg = error && error.responseJSON && error.responseJSON.error ? error.responseJSON.error : '��lem ba�ar�s�z.';
+      const errorMsg = error && error.responseJSON && error.responseJSON.error ? error.responseJSON.error : 'İşlem başarısız.';
       app.alerts.show({ type: 'error' }, errorMsg);
       this.isSavingName = false;
       m.redraw();
@@ -520,11 +520,11 @@ export default class FramioSettingsPage extends ExtensionPage {
     this.settings['framio-upload-exif.custom_fields'](JSON.stringify(this.customFields));
 
     saveSettings(this.settings)
-      .then(() => app.alerts.show({ type: 'success' }, 'T�m ayarlar ba�ar�yla kaydedildi!'));
+      .then(() => app.alerts.show({ type: 'success' }, 'Tüm ayarlar başarıyla kaydedildi!'));
   }
 
   updateTags() {
-    if (!confirm('T�m foto�raflar�n ALT etiketleri mesajlardaki bilgilerle g�ncellenecek. Devam?')) return;
+    if (!confirm('Tüm fotoğrafların ALT etiketleri mesajlardaki bilgilerle güncellenecek. Devam?')) return;
 
     this.isUpdatingTags = true;
     m.redraw();
@@ -533,9 +533,9 @@ export default class FramioSettingsPage extends ExtensionPage {
         method: 'POST',
         url: app.forum.attribute('apiUrl') + '/framio-update-alt-tags'
     }).then(response => {
-        app.alerts.show({ type: 'success' }, `Ba�ar�l�! Toplam ${response.updated_count} ba�lant� g�ncellendi.`);
+        app.alerts.show({ type: 'success' }, `Başarılı! Toplam ${response.updated_count} bağlantı güncellendi.`);
     }).catch(error => {
-        app.alerts.show({ type: 'error' }, 'Beklenmedik bir hata olu�tu.');
+        app.alerts.show({ type: 'error' }, 'Beklenmedik bir hata oluştu.');
     }).finally(() => {
         this.isUpdatingTags = false;
         m.redraw();
@@ -544,18 +544,18 @@ export default class FramioSettingsPage extends ExtensionPage {
 
   performSearch() {
     this.offset = 0;
-    this.loadImages(); this.loadWatermarks();
+    this.loadImages();
   }
 
   changePage(direction) {
     this.offset += direction * this.limit;
     if (this.offset < 0) this.offset = 0;
-    this.loadImages(); this.loadWatermarks();
+    this.loadImages();
   }
 
   loadImages() {
     this.isLoading = true;
-    this.images = []; this.adminWatermarks = []; 
+    this.images = []; 
     m.redraw();
 
     const params = { page: { offset: this.offset, limit: this.limit } };
